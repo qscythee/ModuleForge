@@ -1,43 +1,9 @@
 gitSourceBranch = "main"
 
 [docusaurus]
-url = "https://raild3x.github.io"
-baseUrl = "/ModulesOnRails"
-
-
-[[classOrder]]
-classes = ["BaseObject"]
+url = "https://qscythee.github.io"
+baseUrl = "/ModuleForge"
 
 [[classOrder]]
-classes = ["Roam"]
-
-[[classOrder]]
-section = "TableManager"
-classes = ["TableManager", "TableState"]
-
-[[classOrder]]
-section = "TableReplicator"
-classes = ["TableReplicator", "ServerTableReplicator", "ClientTableReplicator", "TableReplicatorSingleton", "BaseTableReplicator"]
-
-[[classOrder]]
-section = "NetWire"
-classes = ["NetWire", "ServerNetWire", "ClientNetWire"]
-
-[[classOrder]]
-classes = ["PlayerProfileManager"]
-
-[[classOrder]]
-section = "PlayerDataManager"
-classes = ["PlayerDataManager", "ServerPlayerDataManager", "ClientPlayerDataManager"]
-
-[[classOrder]]
-section = "Instance Component Systems"
-classes = ["Component", "RemoteComponent", "BaseComponent"]
-
-[[classOrder]]
-section = "DropletManager"
-classes = ["DropletManager", "DropletServerManager", "DropletClientManager", "Droplet", "DropletUtil", "ExampleResourceTypeData"]
-
-[[classOrder]]
-section = "Admin Commands [Cmdr]"
-classes = ["CmdrHandler", "CmdrServer", "CmdrClient", "CmdrTypes"]
+section = "Nexus"
+classes = []

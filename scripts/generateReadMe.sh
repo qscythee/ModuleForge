@@ -40,7 +40,10 @@ README_FILE="README.md"
 # Start the README file with a title and table header
 cat <<EOF > "$README_FILE"
 $REPO_NAME is a collection of Wally packages to streamline Roblox development.
-Structure & scripts used from [ModuleOnRails](https://raild3x.github.io/ModulesOnRails/), thanks Raildex!
+
+Structure & scripts used from [ModuleOnRails](https://raild3x.github.io/ModulesOnRails/), thanks raild3x!
+
+---
 
 # Packages
 
