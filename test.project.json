@@ -1,0 +1,27 @@
+{
+	"name": "RailUtil-test",
+	"tree": {
+		"$className": "DataModel",
+
+		"ReplicatedStorage": {
+			"$className": "ReplicatedStorage",
+			"src": {
+				"$path": "lib"
+			},
+			"TestEZ": {
+				"$path": "modules/testez/src"
+			}
+		},
+
+		"TestService": {
+			"$className": "TestService",
+			"$properties": {
+				"ExecuteWithStudioRun": true
+			},
+
+			"run": {
+				"$path": "Testing/runTests.server.lua"
+			}
+		}
+	}
+}

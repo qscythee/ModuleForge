@@ -1,0 +1,19 @@
+[package]
+name = "qscythee/nexus"
+description = "Nexus is a module loading framework for Roblox."
+authors = ["Matthew (qscythee)"]
+version = "0.1.0"
+license = "MIT"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+
+[custom]
+# The properly capitalized and spaced name of the library
+formattedName = "Nexus"
+# The intro page for the documentation
+docsLink = "Nexus"
+
+[dependencies]
+Promise = "evaera/promise@^4.0.0"
+Signal = "sleitnick/signal@2.0.3"
+Symbol = "sleitnick/symbol@^2.0.1"
