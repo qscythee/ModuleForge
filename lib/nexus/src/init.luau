@@ -482,8 +482,6 @@ end
 	You cannot register modules after Nexus has started.
 
 	```lua
-	Nexus.ToggleDebug(true)
-
 	Nexus.Start({
 		ExtensionsToLoad = {
 			ReplicatedStorage.Shared.Extensions.PlayerLifecycles,
@@ -495,7 +493,7 @@ end
 		PostInitPreStartCallback = function()
 			print("All modules have been initialized, about to start them!")
 		end,
-		Debug = true, -- Same as calling Nexus.ToggleDebug(true)
+		Debug = true, -- Same as doing Nexus.Debug = true
 	}):andThen(function()
 		print("Nexus has fully started!")
 	end):catch(warn)
