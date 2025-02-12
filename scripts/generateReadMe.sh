@@ -82,7 +82,7 @@ for PACKAGE_DIR in "$SRC_DIR"/*/ ; do
 
             if [ -z "$FORMATTED_NAME" ]; then
                 FORMATTED_NAME=$PACKAGE_NAME
-                FORMATTED_NAME=$(echo "$FORMATTED_NAME" | sed 's/raild3x\///g')
+                FORMATTED_NAME=$(echo "$FORMATTED_NAME" | sed 's/qscythee\///g')
                 echo "No formatted name provided for $FORMATTED_NAME. Using package name as formatted name."
             fi
 
