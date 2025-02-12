@@ -31,7 +31,7 @@ REPO_NAME=$(echo "$REMOTE_URL" | sed -E 's#https://github.com/[^/]+/([^/]+)\.git
 # Print the repository owner and name
 echo "Repository Owner: $REPO_OWNER"
 echo "Repository Name: $REPO_NAME"
-DOCS_LINK="https://raild3x.github.io/$REPO_NAME"
+DOCS_LINK="https://qscythee.github.io/$REPO_NAME"
 echo "Docs Link: $DOCS_LINK"
 
 # Output README file
@@ -41,7 +41,7 @@ README_FILE="README.md"
 cat <<EOF > "$README_FILE"
 $REPO_NAME is a collection of Wally packages to streamline Roblox development.
 
-Structure & scripts used from [ModuleOnRails](https://raild3x.github.io/ModulesOnRails/), thanks raild3x!
+Structure & scripts used from [ModuleForge](https://qscythee.github.io/qscythee/ModuleForge/).
 
 ---
 

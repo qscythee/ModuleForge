@@ -1,6 +1,6 @@
 ModuleForge is a collection of Wally packages to streamline Roblox development.
 
-Structure & scripts used from [ModuleOnRails](https://raild3x.github.io/ModulesOnRails/), thanks raild3x!
+Structure & scripts used from [ModuleForge](https://qscythee.github.io/qscythee/ModuleForge/).
 
 ---
 
