@@ -3,108 +3,122 @@
 <head>
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.6.3">
-<title data-rh="true">Nexus | ModuleForge</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://qscythee.github.io/ModuleForge/api/Nexus"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docusaurus_tag" content="default"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docsearch:docusaurus_tag" content="default"><meta data-rh="true" property="og:title" content="Nexus | ModuleForge"><meta data-rh="true" name="description" content="Nexus is a module loading provider framework forked from Roam that is inspired by Sleitnick&#x27;s Axis
-framework: https://github.com/Sleitnick/Axis.) This module loader is very barebones and does not feature
-a built-in networking layer like Knit and doesn&#x27;t utilize Axis&#x27;s extension system.
+<title data-rh="true">Nexus | ModuleForge</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://qscythee.github.io/ModuleForge/api/Nexus"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docusaurus_tag" content="default"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docsearch:docusaurus_tag" content="default"><meta data-rh="true" property="og:title" content="Nexus | ModuleForge"><meta data-rh="true" name="description" content="Nexus is a module loading provider framework forked from Roam that is inspired by Sleitnick&#x27;s [Axis
+framework](https://github.com/Sleitnick/Axis).) This module loader is barebones with the exception
+of extensions. There is no built-in networking layer or built-in state management. Nexus is designed
+to be a simple, yet powerful module loader that allows developers to easily load and manage modules
+in their game with the ability to add extensions for additional functionality.
 
 Nexus collects load-elligable modules (modules that pass the predicate if one is supplied) and
 initializes them &quot;syncronously&quot; in the order they were collected in - the order is determined
 &quot;randomly&quot; or by the table of paths provided by the developer. Once all modules are initialized,
 Nexus then &quot;starts&quot; the modules &quot;asyncronously&quot; by spawning the &quot;Start&quot; method in a new thread.
 
-[NOTES]
+### NOTES
 * Nexus does not need to be required in each module.
 * All modules are guaranteed safe to access in the &quot;Start&quot; method.
 * All modules are guaranteed to be initialized before the &quot;Start&quot; method is
 spawned.
-* Modules do not have to have either the &quot;Init&quot; or &quot;Start&quot; method.
-* Modules are guaranteed to be initialized in the order they were defined if a
-custom load order is provided, otherwise it is &quot;random&quot;.
-* The name &quot;Module&quot; or &quot;Controller&quot; is not required, you decide what convention
-to follow when naming your modules.
+* Providers do not have to have either the &quot;Init&quot; or &quot;Start&quot; method.
+* Providers are guaranteed to be initialized in the expected order VIA the custom
+load order or topological sorting where dependencies are actually respected.
+* The name &quot;Provider&quot;, &quot;Service&quot;, or &quot;Controller&quot; is not required, you decide
+what convention to follow when naming your modules.
+* Extensions are optional and are used to extend the functionality of modules
+under-the-hood. They are there to save time writing common boilerplate code.
 
-[EXAMPLE USAGE]
+### EXAMPLE USAGE
 ```lua
-local MyModule = {
+local MyProvider = {
 	Config = {
-		Name = &quot;MyModule&quot;, -- Optional, name is auto-generated.
+		Name = &quot;MyProvider&quot;, -- Optional, name is auto-generated.
 		Dependencies = {
-			MyOtherModule,
+			[MyOtherProvider] = true,
 		},
 	},
 }
 
-function MyModule:Add(x: number, y: number): number
+function MyProvider:Add(x: number, y: number): number
 	return x + y
 end
 
-function MyModule:Init()
-	print(&quot;MyModule initialized!&quot;)
-	print(&quot;This is safe to do:&quot;, MyOtherModule:SomeMethod())
+function MyProvider:Init()
+	print(&quot;MyProvider initialized!&quot;)
+
+	-- This is 100% safe to do:
+	print(&quot;OtherProvider runtime data:&quot;, MyOtherProvider:SomeMethod())
 end
 
-function MyModule:Start()
-	print(&quot;MyModule started!&quot;)
-	print(MyModule:Add(1, 2))
+function MyProvider:Start()
+	print(&quot;MyProvider started!&quot;)
+	print(MyProvider:Add(1, 2))
 end
 
-return MyModule
-```"><meta data-rh="true" property="og:description" content="Nexus is a module loading provider framework forked from Roam that is inspired by Sleitnick&#x27;s Axis
-framework: https://github.com/Sleitnick/Axis.) This module loader is very barebones and does not feature
-a built-in networking layer like Knit and doesn&#x27;t utilize Axis&#x27;s extension system.
+return MyProvider
+```"><meta data-rh="true" property="og:description" content="Nexus is a module loading provider framework forked from Roam that is inspired by Sleitnick&#x27;s [Axis
+framework](https://github.com/Sleitnick/Axis).) This module loader is barebones with the exception
+of extensions. There is no built-in networking layer or built-in state management. Nexus is designed
+to be a simple, yet powerful module loader that allows developers to easily load and manage modules
+in their game with the ability to add extensions for additional functionality.
 
 Nexus collects load-elligable modules (modules that pass the predicate if one is supplied) and
 initializes them &quot;syncronously&quot; in the order they were collected in - the order is determined
 &quot;randomly&quot; or by the table of paths provided by the developer. Once all modules are initialized,
 Nexus then &quot;starts&quot; the modules &quot;asyncronously&quot; by spawning the &quot;Start&quot; method in a new thread.
 
-[NOTES]
+### NOTES
 * Nexus does not need to be required in each module.
 * All modules are guaranteed safe to access in the &quot;Start&quot; method.
 * All modules are guaranteed to be initialized before the &quot;Start&quot; method is
 spawned.
-* Modules do not have to have either the &quot;Init&quot; or &quot;Start&quot; method.
-* Modules are guaranteed to be initialized in the order they were defined if a
-custom load order is provided, otherwise it is &quot;random&quot;.
-* The name &quot;Module&quot; or &quot;Controller&quot; is not required, you decide what convention
-to follow when naming your modules.
+* Providers do not have to have either the &quot;Init&quot; or &quot;Start&quot; method.
+* Providers are guaranteed to be initialized in the expected order VIA the custom
+load order or topological sorting where dependencies are actually respected.
+* The name &quot;Provider&quot;, &quot;Service&quot;, or &quot;Controller&quot; is not required, you decide
+what convention to follow when naming your modules.
+* Extensions are optional and are used to extend the functionality of modules
+under-the-hood. They are there to save time writing common boilerplate code.
 
-[EXAMPLE USAGE]
+### EXAMPLE USAGE
 ```lua
-local MyModule = {
+local MyProvider = {
 	Config = {
-		Name = &quot;MyModule&quot;, -- Optional, name is auto-generated.
+		Name = &quot;MyProvider&quot;, -- Optional, name is auto-generated.
 		Dependencies = {
-			MyOtherModule,
+			[MyOtherProvider] = true,
 		},
 	},
 }
 
-function MyModule:Add(x: number, y: number): number
+function MyProvider:Add(x: number, y: number): number
 	return x + y
 end
 
-function MyModule:Init()
-	print(&quot;MyModule initialized!&quot;)
-	print(&quot;This is safe to do:&quot;, MyOtherModule:SomeMethod())
+function MyProvider:Init()
+	print(&quot;MyProvider initialized!&quot;)
+
+	-- This is 100% safe to do:
+	print(&quot;OtherProvider runtime data:&quot;, MyOtherProvider:SomeMethod())
 end
 
-function MyModule:Start()
-	print(&quot;MyModule started!&quot;)
-	print(MyModule:Add(1, 2))
+function MyProvider:Start()
+	print(&quot;MyProvider started!&quot;)
+	print(MyProvider:Add(1, 2))
 end
 
-return MyModule
+return MyProvider
 ```"><link data-rh="true" rel="canonical" href="https://qscythee.github.io/ModuleForge/api/Nexus"><link data-rh="true" rel="alternate" href="https://qscythee.github.io/ModuleForge/api/Nexus" hreflang="en"><link data-rh="true" rel="alternate" href="https://qscythee.github.io/ModuleForge/api/Nexus" hreflang="x-default"><link rel="stylesheet" href="/ModuleForge/assets/css/styles.63df4edd.css">
-<script src="/ModuleForge/assets/js/runtime~main.0fbc67ac.js" defer="defer"></script>
-<script src="/ModuleForge/assets/js/main.00872ef4.js" defer="defer"></script>
+<script src="/ModuleForge/assets/js/runtime~main.83e2f24c.js" defer="defer"></script>
+<script src="/ModuleForge/assets/js/main.fa606e57.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function t(t){document.documentElement.setAttribute("data-theme",t)}var e=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();null!==e?t(e):window.matchMedia("(prefers-color-scheme: dark)").matches?t("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,t("light"))}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="navbar navbar--fixed-top"><div class="navbar__inner"><div class="navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/ModuleForge/"><b class="navbar__title text--truncate">ModuleForge</b></a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/ModuleForge/api/">API</a></div><div class="navbar__items navbar__items--right"><a href="https://github.com/qscythee/ModuleForge" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="Switch between dark and light mode (currently light mode)" aria-label="Switch between dark and light mode (currently light mode)" aria-live="polite" aria-pressed="false"><svg viewBox="0 0 24 24" width="24" height="24" class="lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" class="darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg></button></div><div class="navbarSearchContainer_Bca1"><div class="navbar__search"><span aria-label="expand searchbar" role="button" class="search-icon" tabindex="0"></span><input id="search_input_react" type="search" placeholder="Loading..." aria-label="Search" class="navbar__search-input search-bar" disabled=""></div></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="main-wrapper mainWrapper_z2l0 docPageContainer_wNNk"><div class="docPage_Dpn1"><div class="docSidebarContainer_o_re"><div class="sidebar_njMd"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_SIkG"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" href="/ModuleForge/api/Nexus">​Nexus</a></li></ul></nav></div></div><main class="docMainContainer_HJE1"><div class="container padding-vert--lg"><div class="row"><div class="col docItemCol_MU3C"><div class="docItemContainer_Wv98"><article><div class="member_J0w1 markdown"><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_oUs_"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><header><h1 class="docTitle_mZRt" style="text-decoration:none"><span style="display:inline-block">Nexus</span></h1><div class="luaClassTags_EipM"></div><div>
 <p>
-  Nexus is a module loading provider framework forked from Roam that is inspired by Sleitnick's Axis
-  framework: <a href="https://github.com/Sleitnick/Axis">https://github.com/Sleitnick/Axis</a>.) This module loader is very barebones and does not feature
-  a built-in networking layer like Knit and doesn't utilize Axis's extension system.
+  Nexus is a module loading provider framework forked from Roam that is inspired by Sleitnick's <a href="https://github.com/Sleitnick/Axis">Axis
+framework</a>.) This module loader is barebones with the exception
+  of extensions. There is no built-in networking layer or built-in state management. Nexus is designed
+  to be a simple, yet powerful module loader that allows developers to easily load and manage modules
+  in their game with the ability to add extensions for additional functionality.
 </p>
 <p>
   Nexus collects load-elligable modules (modules that pass the predicate if one is supplied) and
@@ -112,7 +126,7 @@ return MyModule
   "randomly" or by the table of paths provided by the developer. Once all modules are initialized,
   Nexus then "starts" the modules "asyncronously" by spawning the "Start" method in a new thread.
 </p>
-<p>[NOTES]</p>
+<h3>NOTES</h3>
 <ul>
   <li>Nexus does not need to be required in each module.</li>
   <li>All modules are guaranteed safe to access in the "Start" method.</li>
@@ -120,58 +134,93 @@ return MyModule
     All modules are guaranteed to be initialized before the "Start" method is
     spawned.
   </li>
-  <li>Modules do not have to have either the "Init" or "Start" method.</li>
+  <li>Providers do not have to have either the "Init" or "Start" method.</li>
   <li>
-    Modules are guaranteed to be initialized in the order they were defined if a
-    custom load order is provided, otherwise it is "random".
+    Providers are guaranteed to be initialized in the expected order VIA the custom
+    load order or topological sorting where dependencies are actually respected.
   </li>
   <li>
-    The name "Module" or "Controller" is not required, you decide what convention
-    to follow when naming your modules.
+    The name "Provider", "Service", or "Controller" is not required, you decide
+    what convention to follow when naming your modules.
+  </li>
+  <li>
+    Extensions are optional and are used to extend the functionality of modules
+    under-the-hood. They are there to save time writing common boilerplate code.
   </li>
 </ul>
-<p>[EXAMPLE USAGE]</p>
-<pre class="language-lua"><code class="language-lua"><span class="token keyword">local</span> MyModule <span class="token operator">=</span> <span class="token punctuation">{</span>
+<h3>EXAMPLE USAGE</h3>
+<pre class="language-lua"><code class="language-lua"><span class="token keyword">local</span> MyProvider <span class="token operator">=</span> <span class="token punctuation">{</span>
 	Config <span class="token operator">=</span> <span class="token punctuation">{</span>
-		Name <span class="token operator">=</span> <span class="token string">"MyModule"</span><span class="token punctuation">,</span> <span class="token comment">-- Optional, name is auto-generated.</span>
+		Name <span class="token operator">=</span> <span class="token string">"MyProvider"</span><span class="token punctuation">,</span> <span class="token comment">-- Optional, name is auto-generated.</span>
 		Dependencies <span class="token operator">=</span> <span class="token punctuation">{</span>
-			MyOtherModule<span class="token punctuation">,</span>
+			<span class="token punctuation">[</span>MyOtherProvider<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
 		<span class="token punctuation">}</span><span class="token punctuation">,</span>
 	<span class="token punctuation">}</span><span class="token punctuation">,</span>
 <span class="token punctuation">}</span>
 
-<span class="token keyword">function</span> MyModule<span class="token punctuation">:</span><span class="token function">Add</span><span class="token punctuation">(</span>x<span class="token punctuation">:</span> number<span class="token punctuation">,</span> y<span class="token punctuation">:</span> number<span class="token punctuation">)</span><span class="token punctuation">:</span> number
+<span class="token keyword">function</span> MyProvider<span class="token punctuation">:</span><span class="token function">Add</span><span class="token punctuation">(</span>x<span class="token punctuation">:</span> number<span class="token punctuation">,</span> y<span class="token punctuation">:</span> number<span class="token punctuation">)</span><span class="token punctuation">:</span> number
 	<span class="token keyword">return</span> x <span class="token operator">+</span> y
 <span class="token keyword">end</span>
 
-<span class="token keyword">function</span> MyModule<span class="token punctuation">:</span><span class="token function">Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-	<span class="token function">print</span><span class="token punctuation">(</span><span class="token string">"MyModule initialized!"</span><span class="token punctuation">)</span>
-	<span class="token function">print</span><span class="token punctuation">(</span><span class="token string">"This is safe to do:"</span><span class="token punctuation">,</span> MyOtherModule<span class="token punctuation">:</span><span class="token function">SomeMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">function</span> MyProvider<span class="token punctuation">:</span><span class="token function">Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token function">print</span><span class="token punctuation">(</span><span class="token string">"MyProvider initialized!"</span><span class="token punctuation">)</span>
+
+	<span class="token comment">-- This is 100% safe to do:</span>
+	<span class="token function">print</span><span class="token punctuation">(</span><span class="token string">"OtherProvider runtime data:"</span><span class="token punctuation">,</span> MyOtherProvider<span class="token punctuation">:</span><span class="token function">SomeMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 <span class="token keyword">end</span>
 
-<span class="token keyword">function</span> MyModule<span class="token punctuation">:</span><span class="token function">Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-	<span class="token function">print</span><span class="token punctuation">(</span><span class="token string">"MyModule started!"</span><span class="token punctuation">)</span>
-	<span class="token function">print</span><span class="token punctuation">(</span>MyModule<span class="token punctuation">:</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">function</span> MyProvider<span class="token punctuation">:</span><span class="token function">Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token function">print</span><span class="token punctuation">(</span><span class="token string">"MyProvider started!"</span><span class="token punctuation">)</span>
+	<span class="token function">print</span><span class="token punctuation">(</span>MyProvider<span class="token punctuation">:</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 <span class="token keyword">end</span>
 
-<span class="token keyword">return</span> MyModule
+<span class="token keyword">return</span> MyProvider
 </code></pre>
-</div></header><h2 class="anchor anchorWithStickyNavbar_LWe7" id="types">Types<a href="#types" class="hash-link" aria-label="Direct link to Types" title="Direct link to Types">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="StartConfig"><code style="text-decoration:none">StartConfig</code><a href="#StartConfig" class="hash-link" aria-label="Direct link to StartConfig" title="Direct link to StartConfig">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L79"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code class="purple_ieR2">interface</code> <code>StartConfig<!-- --> <!-- -->{</code><div class="inset_uKQm"><div><code>LoadOrder<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS">string</code><code class="purple_ieR2">}</code><code class="blue_P4bS">?</code><span class="inlineDescription_G7Er">-- <span>
-<p>A table of module paths that will be loaded in the order they are provided.</p>
+</div></header><h2 class="anchor anchorWithStickyNavbar_LWe7" id="types">Types<a href="#types" class="hash-link" aria-label="Direct link to Types" title="Direct link to Types">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="StartConfig"><code style="text-decoration:none">StartConfig</code><a href="#StartConfig" class="hash-link" aria-label="Direct link to StartConfig" title="Direct link to StartConfig">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L92"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code class="purple_ieR2">interface</code> <code>StartConfig<!-- --> <!-- -->{</code><div class="inset_uKQm"><div><code>ExtensionsToLoad<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/ModuleScript" target="_blank" rel="noopener noreferrer">ModuleScript<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="purple_ieR2">}</code><code class="blue_P4bS">?</code><span class="inlineDescription_G7Er">-- <span>
+<p>A table of module scripts of extensions that will be registered</p>
+</span></span></div><div><code>ProvidersToLoad<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/ModuleScript" target="_blank" rel="noopener noreferrer">ModuleScript<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="purple_ieR2">}</code><code class="blue_P4bS">?</code><span class="inlineDescription_G7Er">-- <span>
+<p>A table of module scripts of modules that will be registered and</p>
 </span></span></div><div><code>PostInitPreStartCallback<!-- -->: </code><code class="purple_ieR2">(</code><code class="green_DgR4">(</code><code class="green_DgR4">)</code><code class="green_DgR4"> → </code><code class="blue_P4bS">Promise</code><code class="purple_ieR2">)</code><code class="blue_P4bS">?</code><span class="inlineDescription_G7Er">-- <span>
 <p>A callback that is called after all modules have been</p>
 </span></span></div><div><code>Debug<!-- -->: </code><code class="blue_P4bS">boolean?</code><span class="inlineDescription_G7Er">-- <span>
 <p>Whether to log debug information.</p>
 </span></span></div></div><code>}</code></div><div>
-<p>initialized but before they are started.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Module"><code style="text-decoration:none">Module</code><a href="#Module" class="hash-link" aria-label="Direct link to Module" title="Direct link to Module">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L91"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code class="purple_ieR2">interface</code> <code>Module<!-- --> <!-- -->{</code><div class="inset_uKQm"><div><code>Init<!-- -->: </code><code class="purple_ieR2">(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/ModuleForge/api/Nexus#Module">Module</a></code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code class="blue_P4bS">?</code><span class="inlineDescription_G7Er">-- <span>
-<p>The method that is spawned syncronously when the module is initialized.</p>
-</span></span></div><div><code>Start<!-- -->: </code><code class="purple_ieR2">(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/ModuleForge/api/Nexus#Module">Module</a></code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code class="blue_P4bS">?</code><span class="inlineDescription_G7Er">-- <span>
-<p>The method that is spawned asyncronously when the module is started.</p>
-</span></span></div></div><code>}</code></div><div></div><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ToggleDebug"><code style="text-decoration:none">ToggleDebug</code><a href="#ToggleDebug" class="hash-link" aria-label="Direct link to ToggleDebug" title="Direct link to ToggleDebug">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L190"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Nexus<!-- -->.</code><code class="green_DgR4">ToggleDebug</code><code>(</code><code>value<!-- -->: </code><code class="blue_P4bS">boolean?</code><code>) → </code><code>(</code><code>)</code></div><div>
-<p>Sets debug mode to the given value or flips the current value if no value is provided.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetModule"><code style="text-decoration:none">GetModule</code><a href="#GetModule" class="hash-link" aria-label="Direct link to GetModule" title="Direct link to GetModule">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L208"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Nexus<!-- -->.</code><code class="green_DgR4">GetModule</code><code>(</code><code>name<!-- -->: </code><code class="blue_P4bS">string</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/ModuleForge/api/Nexus#Module">Module</a></code></div><div>
-<p>Returns a module by name. Will error if the module doesn't exist.</p>
+<p>
+  and loaded in the order they are provided.
+  loaded in the order they are provided.
+  initialized and before they are started.
+</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Provider"><code style="text-decoration:none">Provider</code><a href="#Provider" class="hash-link" aria-label="Direct link to Provider" title="Direct link to Provider">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L105"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code class="purple_ieR2">interface</code> <code>Provider<!-- --> <!-- -->{</code><div class="inset_uKQm"><div><code>Init<!-- -->: </code><code class="purple_ieR2">(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/ModuleForge/api/Nexus#Provider">Provider</a></code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code class="blue_P4bS">?</code><span class="inlineDescription_G7Er">-- <span>
+<p>The method that is spawned syncronously when the provider is initialized.</p>
+</span></span></div><div><code>Start<!-- -->: </code><code class="purple_ieR2">(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/ModuleForge/api/Nexus#Provider">Provider</a></code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code class="blue_P4bS">?</code><span class="inlineDescription_G7Er">-- <span>
+<p>The method that is spawned asyncronously when the provider is started.</p>
+</span></span></div></div><code>}</code></div><div></div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Extension"><code style="text-decoration:none">Extension</code><a href="#Extension" class="hash-link" aria-label="Direct link to Extension" title="Direct link to Extension">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L126"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code class="purple_ieR2">interface</code> <code>Extension<!-- --> <!-- -->{</code><div class="inset_uKQm"><div><code>BeforeInit<!-- -->: </code><code class="purple_ieR2">(</code><div class="inset_uKQm"><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/ModuleForge/api/Nexus#Extension">Extension</a></code><code class="purple_ieR2">,</code></div><div class="inset_uKQm"><code>provider<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/ModuleForge/api/Nexus#Provider">Provider</a></code></div><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code class="blue_P4bS">?</code><span class="inlineDescription_G7Er">-- <span>
+<p>The hook that fires before each provider is initialized.</p>
+</span></span></div><div><code>BeforeStart<!-- -->: </code><code class="purple_ieR2">(</code><div class="inset_uKQm"><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/ModuleForge/api/Nexus#Extension">Extension</a></code><code class="purple_ieR2">,</code></div><div class="inset_uKQm"><code>provider<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/ModuleForge/api/Nexus#Provider">Provider</a></code></div><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code class="blue_P4bS">?</code><span class="inlineDescription_G7Er">-- <span>
+<p>The hook that fires before each provider is started.</p>
+</span></span></div></div><code>}</code></div><div>
+<p>
+  Extensions allow developers to extend the functionality of modules under-the-hood.
+  This is useful for adding additional functionality to modules without modifying the provider itself.
+  Developers can save time writing common boilerplate code by using extensions, however, extensions
+  do add a layer of abstraction. The use of extensions is optional and not required.
+</p>
+</div><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Predicates.MatchesName"><code style="text-decoration:none">Predicates.MatchesName</code><a href="#Predicates.MatchesName" class="hash-link" aria-label="Direct link to Predicates.MatchesName" title="Direct link to Predicates.MatchesName">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L278"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Nexus<!-- -->.</code><code class="green_DgR4">Predicates.MatchesName</code><code>(</code><div class="inset_uKQm"><div><code>name<!-- -->: </code><code class="blue_P4bS">string</code><span class="inlineDescription_G7Er">-- <span>
+<p>The name to match.</p>
+</span></span></div></div><code>) → </code><code class="purple_ieR2">(</code><code>moduleScript<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/ModuleScript" target="_blank" rel="noopener noreferrer">ModuleScript<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="blue_P4bS">boolean</code></div><div>
+<p>Returns a predicate that matches a module script's name.</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Predicates.IsService"><code style="text-decoration:none">Predicates.IsService</code><a href="#Predicates.IsService" class="hash-link" aria-label="Direct link to Predicates.IsService" title="Direct link to Predicates.IsService">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L292"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Nexus<!-- -->.</code><code class="green_DgR4">Predicates.IsService</code><code>(</code><code>moduleScript<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/ModuleScript" target="_blank" rel="noopener noreferrer">ModuleScript<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+<p>Returns the matching result of a module script's name ending with "Service".</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Predicates.IsController"><code style="text-decoration:none">Predicates.IsController</code><a href="#Predicates.IsController" class="hash-link" aria-label="Direct link to Predicates.IsController" title="Direct link to Predicates.IsController">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L304"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Nexus<!-- -->.</code><code class="green_DgR4">Predicates.IsController</code><code>(</code><code>moduleScript<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/ModuleScript" target="_blank" rel="noopener noreferrer">ModuleScript<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+<p>Returns the matching result of a module script's name ending with "Controller".</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Predicates.IsProvider"><code style="text-decoration:none">Predicates.IsProvider</code><a href="#Predicates.IsProvider" class="hash-link" aria-label="Direct link to Predicates.IsProvider" title="Direct link to Predicates.IsProvider">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L316"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Nexus<!-- -->.</code><code class="green_DgR4">Predicates.IsProvider</code><code>(</code><code>moduleScript<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/ModuleScript" target="_blank" rel="noopener noreferrer">ModuleScript<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+<p>Returns the matching result of a module script's name ending with "Provider".</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Predicates.IsComponent"><code style="text-decoration:none">Predicates.IsComponent</code><a href="#Predicates.IsComponent" class="hash-link" aria-label="Direct link to Predicates.IsComponent" title="Direct link to Predicates.IsComponent">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L337"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Nexus<!-- -->.</code><code class="green_DgR4">Predicates.IsComponent</code><code>(</code><code>moduleScript<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/ModuleScript" target="_blank" rel="noopener noreferrer">ModuleScript<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+<p>
+  Returns the matching conditions of a module script being a component.
+  This checks if the type is a table, if it has a metatable, and if the
+  __tostring cotains "Component" in the beginning of the string.
+</p>
 
   
     
@@ -180,39 +229,82 @@ return MyModule
         <div class="admonition-heading">
           <h5><span class="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
                 <path d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path>
-              </svg></span><span class="admonition-title">Safety</span></h5>
+              </svg></span><span class="admonition-title">Compatibility</span></h5>
         </div>
         <div class="admonition-content">
           <p>
-            Modules are only safe to access after Nexus has started! If you try to access a module before Nexus
-            has started, you could encounter unexpected behavior.
+            This predicate is only compatible with components Sleitnick's
+            Component library! If you are using a different component library,
+            that doesn't happen to follow the same structure, you will need to
+            write your own predicate.
           </p>
         </div>
       </div>
     
   
 
-<pre class="language-lua"><code class="language-lua"><span class="token keyword">local</span> MyModule <span class="token operator">=</span> Nexus<span class="token punctuation">.</span><span class="token function">GetModule</span><span class="token punctuation">(</span><span class="token string">"MyModule"</span><span class="token punctuation">)</span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetProvider"><code style="text-decoration:none">GetProvider</code><a href="#GetProvider" class="hash-link" aria-label="Direct link to GetProvider" title="Direct link to GetProvider">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L360"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Nexus<!-- -->.</code><code class="green_DgR4">GetProvider</code><code>(</code><code>name<!-- -->: </code><code class="blue_P4bS">string</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/ModuleForge/api/Nexus#Provider">Provider</a></code></div><div>
+<p>Returns a provider by name. Will error if the provider doesn't exist.</p>
+
+  
+    
+    
+      <div class="admonition admonition-warning alert alert--warning">
+        <div class="admonition-heading">
+          <h5><span class="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                <path d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path>
+              </svg></span><span class="admonition-title">Safety</span></h5>
+        </div>
+        <div class="admonition-content">
+          <p>
+            Providers are only safe to access after Nexus has started! If you try to access a provider before Nexus
+            has started, you could encounter unexpected behavior.
+          </p>
+          <pre class="language-lua"><code class="language-lua"><span class="token keyword">local</span> MyProvider <span class="token operator">=</span> Nexus<span class="token punctuation">.</span><span class="token function">GetProvider</span><span class="token punctuation">(</span><span class="token string">"MyModule"</span><span class="token punctuation">)</span>
 <span class="token comment">-- Safe ONLY after Nexus has started.</span>
 MyModule<span class="token punctuation">:</span><span class="token function">SomeMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 </code></pre>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetNameFromModule"><code style="text-decoration:none">GetNameFromModule</code><a href="#GetNameFromModule" class="hash-link" aria-label="Direct link to GetNameFromModule" title="Direct link to GetNameFromModule">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L224"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Nexus<!-- -->.</code><code class="green_DgR4">GetNameFromModule</code><code>(</code><code>module<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/ModuleForge/api/Nexus#Module">Module</a></code><code>) → </code><code class="blue_P4bS">string</code></div><div>
-<p>Returns the name of a module.</p>
-<pre class="language-lua"><code class="language-lua"><span class="token keyword">local</span> MyModule <span class="token operator">=</span> Nexus<span class="token punctuation">.</span><span class="token function">GetModule</span><span class="token punctuation">(</span><span class="token string">"MyModule"</span><span class="token punctuation">)</span>
-<span class="token function">print</span><span class="token punctuation">(</span>Nexus<span class="token punctuation">.</span><span class="token function">GetNameFromModule</span><span class="token punctuation">(</span>MyModule<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment">-- "MyModule"</span>
+        </div>
+      </div>
+    
+  
+
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetNameFromProvider"><code style="text-decoration:none">GetNameFromProvider</code><a href="#GetNameFromProvider" class="hash-link" aria-label="Direct link to GetNameFromProvider" title="Direct link to GetNameFromProvider">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L375"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Nexus<!-- -->.</code><code class="green_DgR4">GetNameFromProvider</code><code>(</code><code>prov<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/ModuleForge/api/Nexus#Provider">Provider</a></code><code>) → </code><code class="blue_P4bS">string</code></div><div>
+<p>Returns the name of a provider.</p>
+<pre class="language-lua"><code class="language-lua"><span class="token keyword">local</span> MyProvider <span class="token operator">=</span> Nexus<span class="token punctuation">.</span><span class="token function">GetProvider</span><span class="token punctuation">(</span><span class="token string">"MyModule"</span><span class="token punctuation">)</span>
+<span class="token function">print</span><span class="token punctuation">(</span>Nexus<span class="token punctuation">.</span><span class="token function">GetNameFromProvider</span><span class="token punctuation">(</span>MyModule<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment">-- "MyModule"</span>
 </code></pre>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="RegisterModulesIn"><code style="text-decoration:none">RegisterModulesIn</code><a href="#RegisterModulesIn" class="hash-link" aria-label="Direct link to RegisterModulesIn" title="Direct link to RegisterModulesIn">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L238"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Nexus<!-- -->.</code><code class="green_DgR4">RegisterModulesIn</code><code>(</code><div class="inset_uKQm"><div><code>dir<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/Folder" target="_blank" rel="noopener noreferrer">Folder<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc"> | </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/ModuleScript" target="_blank" rel="noopener noreferrer">ModuleScript<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc"> | </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/Folder" target="_blank" rel="noopener noreferrer">Folder<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc"> | </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/ModuleScript" target="_blank" rel="noopener noreferrer">ModuleScript<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="purple_ieR2">}</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="RegisterExtensionsIn"><code style="text-decoration:none">RegisterExtensionsIn</code><a href="#RegisterExtensionsIn" class="hash-link" aria-label="Direct link to RegisterExtensionsIn" title="Direct link to RegisterExtensionsIn">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L393"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Nexus<!-- -->.</code><code class="green_DgR4">RegisterExtensionsIn</code><code>(</code><div class="inset_uKQm"><div><code>dir<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/Folder" target="_blank" rel="noopener noreferrer">Folder<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc"> | </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/ModuleScript" target="_blank" rel="noopener noreferrer">ModuleScript<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc"> | </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/Folder" target="_blank" rel="noopener noreferrer">Folder<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc"> | </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/ModuleScript" target="_blank" rel="noopener noreferrer">ModuleScript<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="purple_ieR2">}</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>The directory or directories</p>
+</span></span></div><div><code>predicate<!-- -->: </code><code class="purple_ieR2">(</code><code>moduleScript<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/ModuleScript" target="_blank" rel="noopener noreferrer">ModuleScript<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="blue_P4bS">boolean</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>The predicate to filter extensions.</p>
+</span></span></div><div><code>deepSearch<!-- -->: </code><code class="blue_P4bS">boolean?</code><span class="inlineDescription_G7Er">-- <span>
+<p>Whether to search recursively within module scripts.</p>
+</span></span></div></div><code>) → </code><code>(</code><code>)</code></div><div>
+<p>Recursively registers extensions in the provided directories.</p>
+<p>to search for modules.</p>
+<pre class="language-lua"><code class="language-lua">Nexus<span class="token punctuation">.</span><span class="token function">RegisterExtensionsIn</span><span class="token punctuation">(</span>ServerScriptService<span class="token punctuation">.</span>Extensions<span class="token punctuation">,</span> Nexus<span class="token punctuation">.</span>Predicates<span class="token punctuation">.</span>IsExtension<span class="token punctuation">)</span>
+</code></pre>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="RegisterExtension"><code style="text-decoration:none">RegisterExtension</code><a href="#RegisterExtension" class="hash-link" aria-label="Direct link to RegisterExtension" title="Direct link to RegisterExtension">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L405"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Nexus<!-- -->.</code><code class="green_DgR4">RegisterExtension</code><code>(</code><code>ext<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/ModuleForge/api/Nexus#Extension">Extension</a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/ModuleForge/api/Nexus#Extension">Extension</a></code></div><div>
+<p>Returns the name of an extension.</p>
+<pre class="language-lua"><code class="language-lua"><span class="token keyword">local</span> MyExtension <span class="token operator">=</span> Nexus<span class="token punctuation">.</span><span class="token function">GetExtension</span><span class="token punctuation">(</span><span class="token string">"MyExtension"</span><span class="token punctuation">)</span>
+<span class="token function">print</span><span class="token punctuation">(</span>Nexus<span class="token punctuation">.</span><span class="token function">GetNameFromExtension</span><span class="token punctuation">(</span>MyExtension<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment">-- "MyExtension"</span>
+</code></pre>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="RegisterProvidersIn"><code style="text-decoration:none">RegisterProvidersIn</code><a href="#RegisterProvidersIn" class="hash-link" aria-label="Direct link to RegisterProvidersIn" title="Direct link to RegisterProvidersIn">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L430"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Nexus<!-- -->.</code><code class="green_DgR4">RegisterProvidersIn</code><code>(</code><div class="inset_uKQm"><div><code>dir<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/Folder" target="_blank" rel="noopener noreferrer">Folder<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc"> | </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/ModuleScript" target="_blank" rel="noopener noreferrer">ModuleScript<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc"> | </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/Folder" target="_blank" rel="noopener noreferrer">Folder<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc"> | </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/ModuleScript" target="_blank" rel="noopener noreferrer">ModuleScript<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="purple_ieR2">}</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
 <p>The directory or directories</p>
 </span></span></div><div><code>predicate<!-- -->: </code><code class="purple_ieR2">(</code><code>moduleScript<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/ModuleScript" target="_blank" rel="noopener noreferrer">ModuleScript<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="blue_P4bS">boolean</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
 <p>The predicate to filter modules.</p>
-</span></span></div><div><code>depth<!-- -->: </code><code class="blue_P4bS">number?</code><span class="inlineDescription_G7Er">-- <span>
-<p>The depth to recursively search for modules. Defaults to math.huge.</p>
+</span></span></div><div><code>deepSearch<!-- -->: </code><code class="blue_P4bS">boolean?</code><span class="inlineDescription_G7Er">-- <span>
+<p>Whether to search recursively within module scripts.</p>
 </span></span></div></div><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Recursively registers modules in the provided directories.</p>
 <p>to search for modules.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="RegisterModule"><code style="text-decoration:none">RegisterModule</code><a href="#RegisterModule" class="hash-link" aria-label="Direct link to RegisterModule" title="Direct link to RegisterModule">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L290"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Nexus<!-- -->.</code><code class="green_DgR4">RegisterModule</code><code>(</code><code>module<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/ModuleForge/api/Nexus#Module">Module</a></code><code>) → </code><code>(</code><code>)</code></div><div>
-<p>Registers a module to be loaded by Nexus. This method should be called before Nexus.Start is called.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Start"><code style="text-decoration:none">Start</code><a href="#Start" class="hash-link" aria-label="Direct link to Start" title="Direct link to Start">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L365"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Nexus<!-- -->.</code><code class="green_DgR4">Start</code><code>(</code><div class="inset_uKQm"><div><code>config<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/ModuleForge/api/Nexus#StartConfig">StartConfig?</a></code><span class="inlineDescription_G7Er">-- <span>
+<pre class="language-lua"><code class="language-lua">Nexus<span class="token punctuation">.</span><span class="token function">RegisterProvidersIn</span><span class="token punctuation">(</span>ServerScriptService<span class="token punctuation">.</span>Services<span class="token punctuation">,</span> Nexus<span class="token punctuation">.</span>Predicates<span class="token punctuation">.</span>IsService<span class="token punctuation">)</span>
+Nexus<span class="token punctuation">.</span><span class="token function">RegisterProvidersIn</span><span class="token punctuation">(</span>ReplicatedStorage<span class="token punctuation">.</span>Client<span class="token punctuation">.</span>Controllers<span class="token punctuation">,</span> Nexus<span class="token punctuation">.</span>Predicates<span class="token punctuation">.</span>IsController<span class="token punctuation">)</span>
+</code></pre>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="RegisterProvider"><code style="text-decoration:none">RegisterProvider</code><a href="#RegisterProvider" class="hash-link" aria-label="Direct link to RegisterProvider" title="Direct link to RegisterProvider">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L437"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Nexus<!-- -->.</code><code class="green_DgR4">RegisterProvider</code><code>(</code><code>prov<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/ModuleForge/api/Nexus#Provider">Provider</a></code><code>) → </code><code>(</code><code>)</code></div><div>
+<p>Registers a provider to be loaded by Nexus. This method should be called before Nexus.Start is called.</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Start"><code style="text-decoration:none">Start</code><a href="#Start" class="hash-link" aria-label="Direct link to Start" title="Direct link to Start">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L510"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Nexus<!-- -->.</code><code class="green_DgR4">Start</code><code>(</code><div class="inset_uKQm"><div><code>config<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/ModuleForge/api/Nexus#StartConfig">StartConfig?</a></code><span class="inlineDescription_G7Er">-- <span>
 <p>The configuration for starting Nexus.</p>
 </span></span></div></div><code>) → </code><code class="blue_P4bS">Promise</code><span class="inlineDescription_G7Er">-- <span>
 <p>A promise that is resolved once Nexus has fully started.</p>
@@ -222,7 +314,7 @@ MyModule<span class="token punctuation">:</span><span class="token function">Som
   
     
     
-      <div class="admonition admonition-caution alert alert--warning">
+      <div class="admonition admonition-warning alert alert--warning">
         <div class="admonition-heading">
           <h5><span class="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
                 <path d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path>
@@ -233,17 +325,12 @@ MyModule<span class="token punctuation">:</span><span class="token function">Som
             Can only be called once. Calling more than once will throw an error.
             You cannot register modules after Nexus has started.
           </p>
-        </div>
-      </div>
-    
-  
-
-<pre class="language-lua"><code class="language-lua">Nexus<span class="token punctuation">.</span><span class="token function">ToggleDebug</span><span class="token punctuation">(</span><span class="token keyword">true</span><span class="token punctuation">)</span>
+          <pre class="language-lua"><code class="language-lua">Nexus<span class="token punctuation">.</span><span class="token function">ToggleDebug</span><span class="token punctuation">(</span><span class="token keyword">true</span><span class="token punctuation">)</span>
 
 Nexus<span class="token punctuation">.</span><span class="token function">Start</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
-	LoadOrder <span class="token operator">=</span> <span class="token punctuation">{</span>
-		<span class="token string">"MyOtherModule"</span><span class="token punctuation">,</span>
-		<span class="token string">"MyModule"</span><span class="token punctuation">,</span>
+	<span class="token punctuation">{</span>
+		<span class="token string">"MyOtherProvider"</span><span class="token punctuation">,</span>
+		<span class="token string">"MyProvider"</span><span class="token punctuation">,</span>
 	<span class="token punctuation">}</span><span class="token punctuation">,</span>
 	PostInitPreStartCallback <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 		<span class="token function">print</span><span class="token punctuation">(</span><span class="token string">"All modules have been initialized, about to start them!"</span><span class="token punctuation">)</span>
@@ -253,38 +340,136 @@ Nexus<span class="token punctuation">.</span><span class="token function">Start<
 	<span class="token function">print</span><span class="token punctuation">(</span><span class="token string">"Nexus has fully started!"</span><span class="token punctuation">)</span>
 <span class="token keyword">end</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token function">catch</span><span class="token punctuation">(</span>warn<span class="token punctuation">)</span>
 </code></pre>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="PromiseOnStarted"><code style="text-decoration:none">PromiseOnStarted</code><a href="#PromiseOnStarted" class="hash-link" aria-label="Direct link to PromiseOnStarted" title="Direct link to PromiseOnStarted">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L491"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Nexus<!-- -->.</code><code class="green_DgR4">PromiseOnStarted</code><code>(</code><code>) → </code><code class="blue_P4bS">Promise</code></div><div>
+        </div>
+      </div>
+    
+  
+
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="PromiseOnStarted"><code style="text-decoration:none">PromiseOnStarted</code><a href="#PromiseOnStarted" class="hash-link" aria-label="Direct link to PromiseOnStarted" title="Direct link to PromiseOnStarted">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/qscythee/ModuleForge/blob/main/lib/nexus/src/init.luau#L698"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Nexus<!-- -->.</code><code class="green_DgR4">PromiseOnStarted</code><code>(</code><code>) → </code><code class="blue_P4bS">Promise</code></div><div>
 <p>
   Returns a promise that is resolved once Nexus has fully started. This is useful for any code that
   needs to tie into Nexus modules but is not the script that called <code>Start</code>.
 </p>
 <pre class="language-lua"><code class="language-lua">Nexus<span class="token punctuation">.</span><span class="token function">PromiseOnStarted</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token function">andThen</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-	<span class="token keyword">local</span> MyModule <span class="token operator">=</span> Nexus<span class="token punctuation">.</span><span class="token function">GetModule</span><span class="token punctuation">(</span><span class="token string">"MyModule"</span><span class="token punctuation">)</span>
+	<span class="token keyword">local</span> MyProvider <span class="token operator">=</span> Nexus<span class="token punctuation">.</span><span class="token function">GetProvider</span><span class="token punctuation">(</span><span class="token string">"MyModule"</span><span class="token punctuation">)</span>
 	MyModule<span class="token punctuation">:</span><span class="token function">SomeMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span class="token keyword">end</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token function">catch</span><span class="token punctuation">(</span>warn<span class="token punctuation">)</span>
 </code></pre>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
         {
-            &quot;name&quot;: &quot;ToggleDebug&quot;,
-            &quot;desc&quot;: &quot;Sets debug mode to the given value or flips the current value if no value is provided.&quot;,
+            &quot;name&quot;: &quot;Predicates.MatchesName&quot;,
+            &quot;desc&quot;: &quot;Returns a predicate that matches a module script&#x27;s name.&quot;,
             &quot;params&quot;: [
                 {
-                    &quot;name&quot;: &quot;value&quot;,
-                    &quot;desc&quot;: &quot;&quot;,
-                    &quot;lua_type&quot;: &quot;boolean?&quot;
+                    &quot;name&quot;: &quot;name&quot;,
+                    &quot;desc&quot;: &quot;The name to match.&quot;,
+                    &quot;lua_type&quot;: &quot;string&quot;
                 }
             ],
-            &quot;returns&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;(moduleScript: ModuleScript) -&gt; boolean&quot;
+                }
+            ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 190,
+                &quot;line&quot;: 278,
                 &quot;path&quot;: &quot;lib/nexus/src/init.luau&quot;
             }
         },
         {
-            &quot;name&quot;: &quot;GetModule&quot;,
-            &quot;desc&quot;: &quot;Returns a module by name. Will error if the module doesn&#x27;t exist.\n\n:::caution Safety\nModules are only safe to access after Nexus has started! If you try to access a module before Nexus\nhas started, you could encounter unexpected behavior.\n:::\n\n```lua\nlocal MyModule = Nexus.GetModule(\&quot;MyModule\&quot;)\n-- Safe ONLY after Nexus has started.\nMyModule:SomeMethod()\n```&quot;,
+            &quot;name&quot;: &quot;Predicates.IsService&quot;,
+            &quot;desc&quot;: &quot;Returns the matching result of a module script&#x27;s name ending with \&quot;Service\&quot;.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;moduleScript&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;ModuleScript&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 292,
+                &quot;path&quot;: &quot;lib/nexus/src/init.luau&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;Predicates.IsController&quot;,
+            &quot;desc&quot;: &quot;Returns the matching result of a module script&#x27;s name ending with \&quot;Controller\&quot;.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;moduleScript&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;ModuleScript&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 304,
+                &quot;path&quot;: &quot;lib/nexus/src/init.luau&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;Predicates.IsProvider&quot;,
+            &quot;desc&quot;: &quot;Returns the matching result of a module script&#x27;s name ending with \&quot;Provider\&quot;.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;moduleScript&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;ModuleScript&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 316,
+                &quot;path&quot;: &quot;lib/nexus/src/init.luau&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;Predicates.IsComponent&quot;,
+            &quot;desc&quot;: &quot;Returns the matching conditions of a module script being a component.\nThis checks if the type is a table, if it has a metatable, and if the\n__tostring cotains \&quot;Component\&quot; in the beginning of the string.\n\n:::caution Compatibility\nThis predicate is only compatible with components Sleitnick&#x27;s\nComponent library! If you are using a different component library,\nthat doesn&#x27;t happen to follow the same structure, you will need to\nwrite your own predicate.\n:::&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;moduleScript&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;ModuleScript&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 337,
+                &quot;path&quot;: &quot;lib/nexus/src/init.luau&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;GetProvider&quot;,
+            &quot;desc&quot;: &quot;Returns a provider by name. Will error if the provider doesn&#x27;t exist.\n\n:::warning Safety\nProviders are only safe to access after Nexus has started! If you try to access a provider before Nexus\nhas started, you could encounter unexpected behavior.\n\n```lua\nlocal MyProvider = Nexus.GetProvider(\&quot;MyModule\&quot;)\n-- Safe ONLY after Nexus has started.\nMyModule:SomeMethod()\n```\n:::&quot;,
             &quot;params&quot;: [
                 {
                     &quot;name&quot;: &quot;name&quot;,
@@ -295,23 +480,23 @@ Nexus<span class="token punctuation">.</span><span class="token function">Start<
             &quot;returns&quot;: [
                 {
                     &quot;desc&quot;: &quot;&quot;,
-                    &quot;lua_type&quot;: &quot;Module\n&quot;
+                    &quot;lua_type&quot;: &quot;Provider\n&quot;
                 }
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 208,
+                &quot;line&quot;: 360,
                 &quot;path&quot;: &quot;lib/nexus/src/init.luau&quot;
             }
         },
         {
-            &quot;name&quot;: &quot;GetNameFromModule&quot;,
-            &quot;desc&quot;: &quot;Returns the name of a module.\n\n```lua\nlocal MyModule = Nexus.GetModule(\&quot;MyModule\&quot;)\nprint(Nexus.GetNameFromModule(MyModule)) -- \&quot;MyModule\&quot;\n```&quot;,
+            &quot;name&quot;: &quot;GetNameFromProvider&quot;,
+            &quot;desc&quot;: &quot;Returns the name of a provider.\n\n```lua\nlocal MyProvider = Nexus.GetProvider(\&quot;MyModule\&quot;)\nprint(Nexus.GetNameFromProvider(MyModule)) -- \&quot;MyModule\&quot;\n```&quot;,
             &quot;params&quot;: [
                 {
-                    &quot;name&quot;: &quot;module&quot;,
+                    &quot;name&quot;: &quot;prov&quot;,
                     &quot;desc&quot;: &quot;&quot;,
-                    &quot;lua_type&quot;: &quot;Module&quot;
+                    &quot;lua_type&quot;: &quot;Provider&quot;
                 }
             ],
             &quot;returns&quot;: [
@@ -322,13 +507,62 @@ Nexus<span class="token punctuation">.</span><span class="token function">Start<
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 224,
+                &quot;line&quot;: 375,
                 &quot;path&quot;: &quot;lib/nexus/src/init.luau&quot;
             }
         },
         {
-            &quot;name&quot;: &quot;RegisterModulesIn&quot;,
-            &quot;desc&quot;: &quot;Recursively registers modules in the provided directories.\n\nto search for modules.&quot;,
+            &quot;name&quot;: &quot;RegisterExtensionsIn&quot;,
+            &quot;desc&quot;: &quot;Recursively registers extensions in the provided directories.\n\nto search for modules.\n\n```lua\nNexus.RegisterExtensionsIn(ServerScriptService.Extensions, Nexus.Predicates.IsExtension)\n```&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;dir&quot;,
+                    &quot;desc&quot;: &quot;The directory or directories&quot;,
+                    &quot;lua_type&quot;: &quot;Folder | ModuleScript | { Folder | ModuleScript }&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;predicate&quot;,
+                    &quot;desc&quot;: &quot;The predicate to filter extensions.&quot;,
+                    &quot;lua_type&quot;: &quot;(moduleScript: ModuleScript) -&gt; boolean&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;deepSearch&quot;,
+                    &quot;desc&quot;: &quot;Whether to search recursively within module scripts.&quot;,
+                    &quot;lua_type&quot;: &quot;boolean?&quot;
+                }
+            ],
+            &quot;returns&quot;: [],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 393,
+                &quot;path&quot;: &quot;lib/nexus/src/init.luau&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;RegisterExtension&quot;,
+            &quot;desc&quot;: &quot;Returns the name of an extension.\n\n```lua\nlocal MyExtension = Nexus.GetExtension(\&quot;MyExtension\&quot;)\nprint(Nexus.GetNameFromExtension(MyExtension)) -- \&quot;MyExtension\&quot;\n```&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;ext&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;Extension&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;Extension\n&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 405,
+                &quot;path&quot;: &quot;lib/nexus/src/init.luau&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;RegisterProvidersIn&quot;,
+            &quot;desc&quot;: &quot;Recursively registers modules in the provided directories.\n\nto search for modules.\n\n```lua\nNexus.RegisterProvidersIn(ServerScriptService.Services, Nexus.Predicates.IsService)\nNexus.RegisterProvidersIn(ReplicatedStorage.Client.Controllers, Nexus.Predicates.IsController)\n```&quot;,
             &quot;params&quot;: [
                 {
                     &quot;name&quot;: &quot;dir&quot;,
@@ -341,38 +575,38 @@ Nexus<span class="token punctuation">.</span><span class="token function">Start<
                     &quot;lua_type&quot;: &quot;(moduleScript: ModuleScript) -&gt; boolean&quot;
                 },
                 {
-                    &quot;name&quot;: &quot;depth&quot;,
-                    &quot;desc&quot;: &quot;The depth to recursively search for modules. Defaults to math.huge.&quot;,
-                    &quot;lua_type&quot;: &quot;number?&quot;
+                    &quot;name&quot;: &quot;deepSearch&quot;,
+                    &quot;desc&quot;: &quot;Whether to search recursively within module scripts.&quot;,
+                    &quot;lua_type&quot;: &quot;boolean?&quot;
                 }
             ],
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 238,
+                &quot;line&quot;: 430,
                 &quot;path&quot;: &quot;lib/nexus/src/init.luau&quot;
             }
         },
         {
-            &quot;name&quot;: &quot;RegisterModule&quot;,
-            &quot;desc&quot;: &quot;Registers a module to be loaded by Nexus. This method should be called before Nexus.Start is called.&quot;,
+            &quot;name&quot;: &quot;RegisterProvider&quot;,
+            &quot;desc&quot;: &quot;Registers a provider to be loaded by Nexus. This method should be called before Nexus.Start is called.&quot;,
             &quot;params&quot;: [
                 {
-                    &quot;name&quot;: &quot;module&quot;,
+                    &quot;name&quot;: &quot;prov&quot;,
                     &quot;desc&quot;: &quot;&quot;,
-                    &quot;lua_type&quot;: &quot;Module&quot;
+                    &quot;lua_type&quot;: &quot;Provider&quot;
                 }
             ],
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 290,
+                &quot;line&quot;: 437,
                 &quot;path&quot;: &quot;lib/nexus/src/init.luau&quot;
             }
         },
         {
             &quot;name&quot;: &quot;Start&quot;,
-            &quot;desc&quot;: &quot;Starts Nexus by initializing and starting all registered modules.\n\n:::caution Call Once\nCan only be called once. Calling more than once will throw an error.\nYou cannot register modules after Nexus has started.\n:::\n\n```lua\nNexus.ToggleDebug(true)\n\nNexus.Start({\n\tLoadOrder = {\n\t\t\&quot;MyOtherModule\&quot;,\n\t\t\&quot;MyModule\&quot;,\n\t},\n\tPostInitPreStartCallback = function()\n\t\tprint(\&quot;All modules have been initialized, about to start them!\&quot;)\n\tend,\n\tDebug = true, -- Same as calling Nexus.ToggleDebug(true)\n}):andThen(function()\n\tprint(\&quot;Nexus has fully started!\&quot;)\nend):catch(warn)\n```&quot;,
+            &quot;desc&quot;: &quot;Starts Nexus by initializing and starting all registered modules.\n\n:::warning Call Once\nCan only be called once. Calling more than once will throw an error.\nYou cannot register modules after Nexus has started.\n\n```lua\nNexus.ToggleDebug(true)\n\nNexus.Start({\n\t{\n\t\t\&quot;MyOtherProvider\&quot;,\n\t\t\&quot;MyProvider\&quot;,\n\t},\n\tPostInitPreStartCallback = function()\n\t\tprint(\&quot;All modules have been initialized, about to start them!\&quot;)\n\tend,\n\tDebug = true, -- Same as calling Nexus.ToggleDebug(true)\n}):andThen(function()\n\tprint(\&quot;Nexus has fully started!\&quot;)\nend):catch(warn)\n```\n:::&quot;,
             &quot;params&quot;: [
                 {
                     &quot;name&quot;: &quot;config&quot;,
@@ -388,13 +622,13 @@ Nexus<span class="token punctuation">.</span><span class="token function">Start<
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 365,
+                &quot;line&quot;: 510,
                 &quot;path&quot;: &quot;lib/nexus/src/init.luau&quot;
             }
         },
         {
             &quot;name&quot;: &quot;PromiseOnStarted&quot;,
-            &quot;desc&quot;: &quot;Returns a promise that is resolved once Nexus has fully started. This is useful for any code that\nneeds to tie into Nexus modules but is not the script that called `Start`.\n\n```lua\nNexus.PromiseOnStarted():andThen(function()\n\tlocal MyModule = Nexus.GetModule(\&quot;MyModule\&quot;)\n\tMyModule:SomeMethod()\nend):catch(warn)\n```&quot;,
+            &quot;desc&quot;: &quot;Returns a promise that is resolved once Nexus has fully started. This is useful for any code that\nneeds to tie into Nexus modules but is not the script that called `Start`.\n\n```lua\nNexus.PromiseOnStarted():andThen(function()\n\tlocal MyProvider = Nexus.GetProvider(\&quot;MyModule\&quot;)\n\tMyModule:SomeMethod()\nend):catch(warn)\n```&quot;,
             &quot;params&quot;: [],
             &quot;returns&quot;: [
                 {
@@ -404,7 +638,7 @@ Nexus<span class="token punctuation">.</span><span class="token function">Start<
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 491,
+                &quot;line&quot;: 698,
                 &quot;path&quot;: &quot;lib/nexus/src/init.luau&quot;
             }
         }
@@ -413,12 +647,17 @@ Nexus<span class="token punctuation">.</span><span class="token function">Start<
     &quot;types&quot;: [
         {
             &quot;name&quot;: &quot;StartConfig&quot;,
-            &quot;desc&quot;: &quot;initialized but before they are started.&quot;,
+            &quot;desc&quot;: &quot;and loaded in the order they are provided.\nloaded in the order they are provided.\ninitialized and before they are started.&quot;,
             &quot;fields&quot;: [
                 {
-                    &quot;name&quot;: &quot;LoadOrder&quot;,
-                    &quot;lua_type&quot;: &quot;{string}?&quot;,
-                    &quot;desc&quot;: &quot;A table of module paths that will be loaded in the order they are provided.&quot;
+                    &quot;name&quot;: &quot;ExtensionsToLoad&quot;,
+                    &quot;lua_type&quot;: &quot;{ ModuleScript }?&quot;,
+                    &quot;desc&quot;: &quot;A table of module scripts of extensions that will be registered&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;ProvidersToLoad&quot;,
+                    &quot;lua_type&quot;: &quot;{ ModuleScript }?&quot;,
+                    &quot;desc&quot;: &quot;A table of module scripts of modules that will be registered and&quot;
                 },
                 {
                     &quot;name&quot;: &quot;PostInitPreStartCallback&quot;,
@@ -432,37 +671,57 @@ Nexus<span class="token punctuation">.</span><span class="token function">Start<
                 }
             ],
             &quot;source&quot;: {
-                &quot;line&quot;: 79,
+                &quot;line&quot;: 92,
                 &quot;path&quot;: &quot;lib/nexus/src/init.luau&quot;
             }
         },
         {
-            &quot;name&quot;: &quot;Module&quot;,
+            &quot;name&quot;: &quot;Provider&quot;,
             &quot;desc&quot;: &quot;&quot;,
             &quot;fields&quot;: [
                 {
                     &quot;name&quot;: &quot;Init&quot;,
-                    &quot;lua_type&quot;: &quot;(self: Module) -&gt; ()?&quot;,
-                    &quot;desc&quot;: &quot;The method that is spawned syncronously when the module is initialized.&quot;
+                    &quot;lua_type&quot;: &quot;(self: Provider) -&gt; ()?&quot;,
+                    &quot;desc&quot;: &quot;The method that is spawned syncronously when the provider is initialized.&quot;
                 },
                 {
                     &quot;name&quot;: &quot;Start&quot;,
-                    &quot;lua_type&quot;: &quot;(self: Module) -&gt; ()?&quot;,
-                    &quot;desc&quot;: &quot;The method that is spawned asyncronously when the module is started.&quot;
+                    &quot;lua_type&quot;: &quot;(self: Provider) -&gt; ()?&quot;,
+                    &quot;desc&quot;: &quot;The method that is spawned asyncronously when the provider is started.&quot;
                 }
             ],
             &quot;source&quot;: {
-                &quot;line&quot;: 91,
+                &quot;line&quot;: 105,
+                &quot;path&quot;: &quot;lib/nexus/src/init.luau&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;Extension&quot;,
+            &quot;desc&quot;: &quot;Extensions allow developers to extend the functionality of modules under-the-hood.\nThis is useful for adding additional functionality to modules without modifying the provider itself.\nDevelopers can save time writing common boilerplate code by using extensions, however, extensions\ndo add a layer of abstraction. The use of extensions is optional and not required.&quot;,
+            &quot;fields&quot;: [
+                {
+                    &quot;name&quot;: &quot;BeforeInit&quot;,
+                    &quot;lua_type&quot;: &quot;(self: Extension, provider: Provider) -&gt; ()?&quot;,
+                    &quot;desc&quot;: &quot;The hook that fires before each provider is initialized.&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;BeforeStart&quot;,
+                    &quot;lua_type&quot;: &quot;(self: Extension, provider: Provider) -&gt; ()?&quot;,
+                    &quot;desc&quot;: &quot;The hook that fires before each provider is started.&quot;
+                }
+            ],
+            &quot;source&quot;: {
+                &quot;line&quot;: 126,
                 &quot;path&quot;: &quot;lib/nexus/src/init.luau&quot;
             }
         }
     ],
     &quot;name&quot;: &quot;Nexus&quot;,
-    &quot;desc&quot;: &quot;Nexus is a module loading provider framework forked from Roam that is inspired by Sleitnick&#x27;s Axis\nframework: https://github.com/Sleitnick/Axis.) This module loader is very barebones and does not feature\na built-in networking layer like Knit and doesn&#x27;t utilize Axis&#x27;s extension system.\n\nNexus collects load-elligable modules (modules that pass the predicate if one is supplied) and\ninitializes them \&quot;syncronously\&quot; in the order they were collected in - the order is determined\n\&quot;randomly\&quot; or by the table of paths provided by the developer. Once all modules are initialized,\nNexus then \&quot;starts\&quot; the modules \&quot;asyncronously\&quot; by spawning the \&quot;Start\&quot; method in a new thread.\n\n[NOTES]\n* Nexus does not need to be required in each module.\n* All modules are guaranteed safe to access in the \&quot;Start\&quot; method.\n* All modules are guaranteed to be initialized before the \&quot;Start\&quot; method is\nspawned.\n* Modules do not have to have either the \&quot;Init\&quot; or \&quot;Start\&quot; method.\n* Modules are guaranteed to be initialized in the order they were defined if a\ncustom load order is provided, otherwise it is \&quot;random\&quot;.\n* The name \&quot;Module\&quot; or \&quot;Controller\&quot; is not required, you decide what convention\nto follow when naming your modules.\n\n[EXAMPLE USAGE]\n```lua\nlocal MyModule = {\n\tConfig = {\n\t\tName = \&quot;MyModule\&quot;, -- Optional, name is auto-generated.\n\t\tDependencies = {\n\t\t\tMyOtherModule,\n\t\t},\n\t},\n}\n\nfunction MyModule:Add(x: number, y: number): number\n\treturn x + y\nend\n\nfunction MyModule:Init()\n\tprint(\&quot;MyModule initialized!\&quot;)\n\tprint(\&quot;This is safe to do:\&quot;, MyOtherModule:SomeMethod())\nend\n\nfunction MyModule:Start()\n\tprint(\&quot;MyModule started!\&quot;)\n\tprint(MyModule:Add(1, 2))\nend\n\nreturn MyModule\n```&quot;,
+    &quot;desc&quot;: &quot;Nexus is a module loading provider framework forked from Roam that is inspired by Sleitnick&#x27;s [Axis\nframework](https://github.com/Sleitnick/Axis).) This module loader is barebones with the exception\nof extensions. There is no built-in networking layer or built-in state management. Nexus is designed\nto be a simple, yet powerful module loader that allows developers to easily load and manage modules\nin their game with the ability to add extensions for additional functionality.\n\nNexus collects load-elligable modules (modules that pass the predicate if one is supplied) and\ninitializes them \&quot;syncronously\&quot; in the order they were collected in - the order is determined\n\&quot;randomly\&quot; or by the table of paths provided by the developer. Once all modules are initialized,\nNexus then \&quot;starts\&quot; the modules \&quot;asyncronously\&quot; by spawning the \&quot;Start\&quot; method in a new thread.\n\n### NOTES\n* Nexus does not need to be required in each module.\n* All modules are guaranteed safe to access in the \&quot;Start\&quot; method.\n* All modules are guaranteed to be initialized before the \&quot;Start\&quot; method is\nspawned.\n* Providers do not have to have either the \&quot;Init\&quot; or \&quot;Start\&quot; method.\n* Providers are guaranteed to be initialized in the expected order VIA the custom\nload order or topological sorting where dependencies are actually respected.\n* The name \&quot;Provider\&quot;, \&quot;Service\&quot;, or \&quot;Controller\&quot; is not required, you decide\nwhat convention to follow when naming your modules.\n* Extensions are optional and are used to extend the functionality of modules\nunder-the-hood. They are there to save time writing common boilerplate code.\n\n### EXAMPLE USAGE\n```lua\nlocal MyProvider = {\n\tConfig = {\n\t\tName = \&quot;MyProvider\&quot;, -- Optional, name is auto-generated.\n\t\tDependencies = {\n\t\t\t[MyOtherProvider] = true,\n\t\t},\n\t},\n}\n\nfunction MyProvider:Add(x: number, y: number): number\n\treturn x + y\nend\n\nfunction MyProvider:Init()\n\tprint(\&quot;MyProvider initialized!\&quot;)\n\n\t-- This is 100% safe to do:\n\tprint(\&quot;OtherProvider runtime data:\&quot;, MyOtherProvider:SomeMethod())\nend\n\nfunction MyProvider:Start()\n\tprint(\&quot;MyProvider started!\&quot;)\n\tprint(MyProvider:Add(1, 2))\nend\n\nreturn MyProvider\n```&quot;,
     &quot;source&quot;: {
-        &quot;line&quot;: 56,
+        &quot;line&quot;: 62,
         &quot;path&quot;: &quot;lib/nexus/src/init.luau&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a><ul><li><a href="#Module" class="table-of-contents__link toc-highlight">Module</a></li><li><a href="#StartConfig" class="table-of-contents__link toc-highlight">StartConfig</a></li></ul></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#GetModule" class="table-of-contents__link toc-highlight">.GetModule</a></li><li><a href="#GetNameFromModule" class="table-of-contents__link toc-highlight">.GetNameFromModule</a></li><li><a href="#PromiseOnStarted" class="table-of-contents__link toc-highlight">.PromiseOnStarted</a></li><li><a href="#RegisterModule" class="table-of-contents__link toc-highlight">.RegisterModule</a></li><li><a href="#RegisterModulesIn" class="table-of-contents__link toc-highlight">.RegisterModulesIn</a></li><li><a href="#Start" class="table-of-contents__link toc-highlight">.Start</a></li><li><a href="#ToggleDebug" class="table-of-contents__link toc-highlight">.ToggleDebug</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2025 qscythee. Built with Moonwave and Docusaurus.</div></div></div></footer></div>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a><ul><li><a href="#Extension" class="table-of-contents__link toc-highlight">Extension</a></li><li><a href="#Provider" class="table-of-contents__link toc-highlight">Provider</a></li><li><a href="#StartConfig" class="table-of-contents__link toc-highlight">StartConfig</a></li></ul></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#GetNameFromProvider" class="table-of-contents__link toc-highlight">.GetNameFromProvider</a></li><li><a href="#GetProvider" class="table-of-contents__link toc-highlight">.GetProvider</a></li><li><a href="#Predicates.IsComponent" class="table-of-contents__link toc-highlight">.Predicates.IsComponent</a></li><li><a href="#Predicates.IsController" class="table-of-contents__link toc-highlight">.Predicates.IsController</a></li><li><a href="#Predicates.IsProvider" class="table-of-contents__link toc-highlight">.Predicates.IsProvider</a></li><li><a href="#Predicates.IsService" class="table-of-contents__link toc-highlight">.Predicates.IsService</a></li><li><a href="#Predicates.MatchesName" class="table-of-contents__link toc-highlight">.Predicates.MatchesName</a></li><li><a href="#PromiseOnStarted" class="table-of-contents__link toc-highlight">.PromiseOnStarted</a></li><li><a href="#RegisterExtension" class="table-of-contents__link toc-highlight">.RegisterExtension</a></li><li><a href="#RegisterExtensionsIn" class="table-of-contents__link toc-highlight">.RegisterExtensionsIn</a></li><li><a href="#RegisterProvider" class="table-of-contents__link toc-highlight">.RegisterProvider</a></li><li><a href="#RegisterProvidersIn" class="table-of-contents__link toc-highlight">.RegisterProvidersIn</a></li><li><a href="#Start" class="table-of-contents__link toc-highlight">.Start</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2025 qscythee. Built with Moonwave and Docusaurus.</div></div></div></footer></div>
 </body>
 </html>

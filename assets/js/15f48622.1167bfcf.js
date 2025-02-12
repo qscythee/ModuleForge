@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[469],{7676:e=>{e.exports=JSON.parse('[{"type":"category","label":"Nexus","collapsible":true,"collapsed":true,"items":[]},{"type":"link","href":"/api/Nexus","label":"\u200bNexus"}]')}}]);
