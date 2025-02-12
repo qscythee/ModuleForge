@@ -325,10 +325,10 @@ end
 	__tostring cotains "Component" in the beginning of the string.
 
 	:::caution Compatibility
-	This predicate is only compatible with components Sleitnick's
-	Component library! If you are using a different component library,
-	that doesn't happen to follow the same structure, you will need to
-	write your own predicate.
+	This predicate is only compatible with component libraries that mimic
+	Sleitnick's Component library! If you are using a different component
+	library, that doesn't happen to follow the same structure, you will
+	need to write your own predicate.
 	:::
 
 	@param moduleScript ModuleScript
