@@ -8,8 +8,14 @@
 			"src": {
 				"$path": "lib"
 			},
+			"Storage": {
+				"$path": "Testing/Storage"
+			},
 			"TestEZ": {
 				"$path": "modules/testez/src"
+			},
+			"Stories": {
+				"$path": "Testing/Stories"
 			}
 		},
 

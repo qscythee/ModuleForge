@@ -5,5 +5,4 @@ url = "https://qscythee.github.io"
 baseUrl = "/ModuleForge"
 
 [[classOrder]]
-section = "Nexus"
-classes = []
+classes = ["Nexus"]

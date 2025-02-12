@@ -39,13 +39,13 @@ README_FILE="README.md"
 
 # Start the README file with a title and table header
 cat <<EOF > "$README_FILE"
-$REPO_NAME is a collection of Wally packages to streamline Roblox development.
-
-Structure & scripts used from [ModuleForge](https://qscythee.github.io/qscythee/ModuleForge/).
+# $REPO_NAME
+A collection of Wally packages to streamline Roblox development.
+You can view documentation for each package [here]($DOCS_LINK).
 
 ---
 
-# Packages
+## Packages
 
 | Package | Latest Version | Description |
 |---------|----------------|-------------|
