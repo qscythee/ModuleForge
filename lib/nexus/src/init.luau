@@ -395,12 +395,7 @@ function Nexus.RegisterExtensionsIn(dir: Directory | { Directory }, predicate: D
 end
 
 --[=[
-	Returns the name of an extension.
-
-	```lua
-	local MyExtension = Nexus.GetExtension("MyExtension")
-	print(Nexus.GetNameFromExtension(MyExtension)) -- "MyExtension"
-	```
+	Registers an extension to be loaded by Nexus. This method should be called before Nexus.Start is called.
 ]=]--
 function Nexus.RegisterExtension(ext: Extension): Extension
 	if Nexus.IsStarted then error("Cannot register extension after Nexus has started.") end
