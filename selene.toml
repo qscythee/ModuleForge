@@ -1,5 +1,7 @@
 std = "roblox+testez"
 
+exclude = ["**/examples/*"]
+
 [rules]
 shadowing = "allow"
 multiple_statements = "allow"
