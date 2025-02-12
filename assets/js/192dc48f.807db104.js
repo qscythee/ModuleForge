@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[708],{4410:e=>{e.exports=JSON.parse('{"sourceUrl":"https://github.com/qscythee/ModuleForge/blob/main","baseUrl":"/ModuleForge/","classOrder":[{"section":"Nexus","classes":[]}],"apiCategories":[]}')}}]);
