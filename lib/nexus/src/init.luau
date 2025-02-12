@@ -490,9 +490,12 @@ end
 	Nexus.ToggleDebug(true)
 
 	Nexus.Start({
-		{
-			"MyOtherProvider",
-			"MyProvider",
+		ExtensionsToLoad = {
+			ReplicatedStorage.Shared.Extensions.PlayerLifecycles,
+		},
+		ProvidersToLoad = {
+			ReplicatedStorage.Shared.Providers.MySharedProvider,
+			ServerScriptService.Server.Providers.MyServerProvider,
 		},
 		PostInitPreStartCallback = function()
 			print("All modules have been initialized, about to start them!")
