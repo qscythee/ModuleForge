@@ -43,7 +43,7 @@ ACTIONS_LINK="https://github.com/$REPO_OWNER/$REPO_NAME/actions"
 cat <<EOF > "$README_FILE"
 <p align="center">
 	<img src="gh-assets/icon.webp" alt="$REPO_NAME Icon" width="82" style="vertical-align: middle; margin-right: 10px;">
-	<b><i><font size="6">$REPO_NAME</font></i></b>
+	<b><i><font size="24">$REPO_NAME</font></i></b>
 </p>
 
 <p align="center">

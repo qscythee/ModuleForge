@@ -1,6 +1,6 @@
 <p align="center">
 	<img src="gh-assets/icon.webp" alt="ModuleForge Icon" width="82" style="vertical-align: middle; margin-right: 10px;">
-	<b><i><font size="6">ModuleForge</font></i></b>
+	<b><i><font size="24">ModuleForge</font></i></b>
 </p>
 
 <p align="center">
