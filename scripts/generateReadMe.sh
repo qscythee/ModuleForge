@@ -41,18 +41,6 @@ ACTIONS_LINK="https://github.com/$REPO_OWNER/$REPO_NAME/actions"
 
 # Start the README file with a title and table header
 cat <<EOF > "$README_FILE"
-<style>
-h1,h2,h3,h4 { border-bottom: 0; }
-
-.markdown-body {
-  --markdown-radius: 3px;
-  --markdown-font: Papyrus, serif;
-  --markdown-text: #333;
-  --markdown-title: hotpink;
-  --markdown-line-height: 2;
-}
-</style>
-
 <p align="center">
 	<img src="gh-assets/icon.webp" alt="$REPO_NAME Icon" width="82" style="vertical-align: middle; margin-right: 10px;">
 	<b><i><font size="6">$REPO_NAME</font></i></b>
