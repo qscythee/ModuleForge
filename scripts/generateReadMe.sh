@@ -51,7 +51,7 @@ cat <<EOF > "$README_FILE"
 
 <p align="center">
 	A collection of Luau packages tailored to supercharge your development experience and speed! 🚀
-	<br>You can view documentation for each package [here]($DOCS_LINK).</br>
+	<br>You can view documentation for each package <a href="$DOCS_LINK">here</a>.</br>
 </p>
 
 <p align="center">

@@ -8,7 +8,7 @@
 
 <p align="center">
 	A collection of Luau packages tailored to supercharge your development experience and speed! 🚀
-	<br>You can view documentation for each package [here](https://qscythee.github.io/ModuleForge).</br>
+	<br>You can view documentation for each package <a href="https://qscythee.github.io/ModuleForge">here</a>.</br>
 </p>
 
 <p align="center">
