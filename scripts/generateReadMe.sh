@@ -42,8 +42,11 @@ ACTIONS_LINK="https://github.com/$REPO_OWNER/$REPO_NAME/actions"
 # Start the README file with a title and table header
 cat <<EOF > "$README_FILE"
 <p align="center">
-	<img src="gh-assets/icon.webp" alt="$REPO_NAME Icon" width="82" style="vertical-align: middle; margin-right: 10px;">
-	<b><i><font size="24">$REPO_NAME</font></i></b>
+	<picture>
+		<source media="(prefers-color-scheme: dark)" srcset="/gh-assets/logo-white.svg"></source>
+		<source media="(prefers-color-scheme: light)" srcset="/gh-assets/logo-black.svg"></source>
+		<img alt="ModuleForge" src="/gh-assets/logo-white.svg" height="70"></img>
+	</picture>
 </p>
 
 <p align="center">
