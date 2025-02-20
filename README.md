@@ -1,15 +1,3 @@
-<style>
-h1,h2,h3,h4 { border-bottom: 0; }
-
-.markdown-body {
-  --markdown-radius: 3px;
-  --markdown-font: Papyrus, serif;
-  --markdown-text: #333;
-  --markdown-title: hotpink;
-  --markdown-line-height: 2;
-}
-</style>
-
 <p align="center">
 	<img src="gh-assets/icon.webp" alt="ModuleForge Icon" width="82" style="vertical-align: middle; margin-right: 10px;">
 	<b><i><font size="6">ModuleForge</font></i></b>
