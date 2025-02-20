@@ -1,6 +1,6 @@
 [package]
 name = "qscythee/nexus"
-description = "Nexus is a module loading framework for Roblox."
+description = "A provider & extension framework for Roblox."
 authors = ["Matthew (qscythee)"]
 version = "0.1.0"
 license = "MIT"

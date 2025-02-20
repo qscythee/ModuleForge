@@ -31,21 +31,50 @@ REPO_NAME=$(echo "$REMOTE_URL" | sed -E 's#https://github.com/[^/]+/([^/]+)\.git
 # Print the repository owner and name
 echo "Repository Owner: $REPO_OWNER"
 echo "Repository Name: $REPO_NAME"
-DOCS_LINK="https://qscythee.github.io/$REPO_NAME"
+DOCS_LINK="https://$REPO_OWNER.github.io/$REPO_NAME"
 echo "Docs Link: $DOCS_LINK"
 
 # Output README file
 README_FILE="README.md"
 
+ACTIONS_LINK="https://github.com/$REPO_OWNER/$REPO_NAME/actions"
+
 # Start the README file with a title and table header
 cat <<EOF > "$README_FILE"
-# $REPO_NAME
-A collection of Wally packages to streamline Roblox development.
-You can view documentation for each package [here]($DOCS_LINK).
+<style>
+h1,h2,h3,h4 { border-bottom: 0; }
+
+.markdown-body {
+  --markdown-radius: 3px;
+  --markdown-font: Papyrus, serif;
+  --markdown-text: #333;
+  --markdown-title: hotpink;
+  --markdown-line-height: 2;
+}
+</style>
+
+<p align="center">
+	<img src="gh-assets/icon.webp" alt="$REPO_NAME Icon" width="82" style="vertical-align: middle; margin-right: 10px;">
+	<b><i><font size="6">$REPO_NAME</font></i></b>
+</p>
+
+<p align="center">
+	A collection of Luau packages tailored to supercharge your development experience and speed! 🚀
+	<br>You can view documentation for each package [here]($DOCS_LINK).
+</p>
+
+<p align="center">
+	<a href="$ACTIONS_LINK"><img src="https://img.shields.io/github/actions/workflow/status/$REPO_OWNER/$REPO_NAME/ci.yaml?branch=main" alt="Build Status"></img></a>
+	<img title="MIT licensed" alt="License" src="https://img.shields.io/github/license/$REPO_OWNER/$REPO_NAME"></img>
+</p>
+
+<p align="center">
+	<a href="https://x.com/qscythee"><img src="https://img.shields.io/badge/X-000000?style=for-the-badge&logo=x&logoColor=white" /></a>
+</p>
 
 ---
 
-## Packages
+## Packages 📦
 
 | Package | Latest Version | Description |
 |---------|----------------|-------------|
@@ -79,16 +108,20 @@ for PACKAGE_DIR in "$SRC_DIR"/*/ ; do
             fi
 
             PACKAGE_DOCS_LINK="$DOCS_LINK/api/$PACKAGE_DOCS_LINK"
+				WALLY_LINK="https://wally.run/package/$PACKAGE_NAME?version=$PACKAGE_VERSION"
 
             if [ -z "$FORMATTED_NAME" ]; then
                 FORMATTED_NAME=$PACKAGE_NAME
-                FORMATTED_NAME=$(echo "$FORMATTED_NAME" | sed 's/qscythee\///g')
+                FORMATTED_NAME=$(echo "$FORMATTED_NAME" | sed "s/$REPO_OWNER\///g")
                 echo "No formatted name provided for $FORMATTED_NAME. Using package name as formatted name."
             fi
 
+				echo "Package Name: $FORMATTED_NAME"
+				echo "Wally link: $WALLY_LINK"
+
             # Append the package information to the README file
             cat <<EOF >> "$README_FILE"
-| [$FORMATTED_NAME]($PACKAGE_DOCS_LINK) | \`$FORMATTED_NAME = "$PACKAGE_NAME@$PACKAGE_VERSION"\` | $PACKAGE_DESCRIPTION |
+| [$FORMATTED_NAME]($PACKAGE_DOCS_LINK) | [\`$FORMATTED_NAME = "$PACKAGE_NAME@$PACKAGE_VERSION"\`]($WALLY_LINK) | $PACKAGE_DESCRIPTION |
 EOF
         else
             echo "Warning: $WALLY_TOML not found"
