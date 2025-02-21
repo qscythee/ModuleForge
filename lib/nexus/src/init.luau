@@ -117,6 +117,7 @@ export type DirectoryPredicate = (moduleScript: ModuleScript) -> boolean
 	@interface Extension
 	.BeforeInit (self: Extension, provider: Provider) -> ()? -- The hook that fires before each provider is initialized.
 	.BeforeStart (self: Extension, provider: Provider) -> ()? -- The hook that fires before each provider is started.
+	.Prepare (self: Extension) -> ()? -- The hook that fires only once before all providers are initialized once.
 
 	Extensions allow developers to extend the functionality of modules under-the-hood.
 	This is useful for adding additional functionality to modules without modifying the provider itself.
@@ -126,6 +127,7 @@ export type DirectoryPredicate = (moduleScript: ModuleScript) -> boolean
 export type Extension = {
 	BeforeInit: <T>(self: T, provider: Provider) -> ()?,
 	BeforeStart: <T>(self: T, provider: Provider) -> ()?,
+	Prepare: <T>(self: T) -> ()?,
 	[any]: any,
 }
 
@@ -188,7 +190,7 @@ end
 
 -- Runs all the extensions for each provider.
 local function runExtensions(fnName: string, prov: Provider?)
-	local function Run(ext: Extension)
+	local function Run(ext)
 		if fnName == "Prepare" and typeof(ext.Prepare) == "function" then
 			debug.profilebegin(`{ext.Name}:Prepare`)
 			ext:Prepare()
@@ -218,7 +220,7 @@ local function runExtensions(fnName: string, prov: Provider?)
 end
 
 -- Registers modules/extensions in their respective directories.
-local function registerIn(type: "Provider" | "Extension", dir: Directory | { Directory }, predicate: DirectoryPredicate?, deepSearch: boolean?)
+local function registerIn(type: "Provider" | "Extension" | "Required", dir: Directory | { Directory }, predicate: DirectoryPredicate?, deepSearch: boolean?)
 	if typeof(dir) == "Instance" then dir = { dir } end
 
 	if Nexus.IsStarted then error(debug.traceback("Cannot register modules after Nexus has started.")) end
@@ -227,7 +229,7 @@ local function registerIn(type: "Provider" | "Extension", dir: Directory | { Dir
 	deepSearch = if deepSearch ~= nil then deepSearch else false
 	if typeof(deepSearch) ~= "boolean" then error(`Arg #3 'deepSearch' must be a boolean or nil, got: {typeof(deepSearch)}`) end
 
-	local provs = {}
+	local mods = {}
 	local function search(inst)
 		if typeof(inst) == "table" then
 			for _, child in inst do
@@ -247,7 +249,7 @@ local function registerIn(type: "Provider" | "Extension", dir: Directory | { Dir
 			if not predicate or predicate(inst) then
 				local mod = ensureUnyieldingRequire(inst)
 				if typeof(mod) ~= "table" then
-					warn(`Provider at '{inst:GetFullName()}' is not a table, got: {typeof(mod)}`)
+					warn(`{type} at '{inst:GetFullName()}' is not a table, got: {typeof(mod)}`)
 					return
 				end
 
@@ -261,7 +263,7 @@ local function registerIn(type: "Provider" | "Extension", dir: Directory | { Dir
 					Nexus.RegisterExtension(mod)
 				end
 
-				table.insert(provs, mod)
+				table.insert(mods, mod)
 
 				if deepSearch then
 					search(inst:GetChildren())
@@ -272,7 +274,7 @@ local function registerIn(type: "Provider" | "Extension", dir: Directory | { Dir
 		end
 	end
 	search(dir)
-	return provs
+	return mods
 end
 
 ----------------------------------------------------------------------------------------------------------------------------------------
@@ -354,6 +356,24 @@ end
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- Methods
 ----------------------------------------------------------------------------------------------------------------------------------------
+
+--[=[
+	Recursively requires modules in the provided directories.
+	Mainly for components!
+
+	@param dir Folder | ModuleScript | { Folder | ModuleScript } -- The directory or directories
+	to search for modules.
+	@param predicate (moduleScript: ModuleScript) -> boolean -- The predicate to filter extensions.
+
+	```lua
+	Nexus.Start():andThen(function()
+		Nexus.RequireModulesIn(ServerScriptService.Components, Nexus.Predicates.IsComponent)
+	end):catch(warn)
+	```
+]=]
+function Nexus.RequireModulesIn(dir: Directory | { Directory }, predicate: DirectoryPredicate?)
+	return registerIn("Required", dir, predicate, true)
+end
 
 --[=[
 	Returns a provider by name. Will error if the provider doesn't exist.
