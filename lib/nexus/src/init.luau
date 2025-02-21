@@ -223,7 +223,7 @@ end
 local function registerIn(type: "Provider" | "Extension" | "Required", dir: Directory | { Directory }, predicate: DirectoryPredicate?, deepSearch: boolean?)
 	if typeof(dir) == "Instance" then dir = { dir } end
 
-	if Nexus.IsStarted then error(debug.traceback("Cannot register modules after Nexus has started.")) end
+	if type ~= "Required" and Nexus.IsStarted then error(debug.traceback("Cannot register modules after Nexus has started.")) end
 	if predicate ~= nil and typeof(predicate) ~= "function" then error(`Arg #2 'predicate' must be a function, got: {typeof(predicate)}`) end
 
 	deepSearch = if deepSearch ~= nil then deepSearch else false
