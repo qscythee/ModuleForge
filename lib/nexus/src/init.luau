@@ -190,7 +190,9 @@ end
 local function runExtensions(fnName: string, prov: Provider)
 	local function Run(ext: Extension)
 		if typeof(ext[fnName]) ~= "function" then return end
+		debug.profilebegin(`{prov.Name} - {ext.Name}:{fnName}`)
 		ext[fnName](ext, prov)
+		debug.profileend()
 		log("Log", `Ran extension {ext.Name}:{fnName} for {prov.Name}.`)
 	end
 
@@ -325,10 +327,10 @@ end
 	__tostring cotains "Component" in the beginning of the string.
 
 	:::caution Compatibility
-	This predicate is only compatible with component libraries that mimic
-	Sleitnick's Component library! If you are using a different component
-	library, that doesn't happen to follow the same structure, you will
-	need to write your own predicate.
+	This predicate is only compatible with components Sleitnick's
+	Component library! If you are using a different component library,
+	that doesn't happen to follow the same structure, you will need to
+	write your own predicate.
 	:::
 
 	@param moduleScript ModuleScript
@@ -395,7 +397,12 @@ function Nexus.RegisterExtensionsIn(dir: Directory | { Directory }, predicate: D
 end
 
 --[=[
-	Registers an extension to be loaded by Nexus. This method should be called before Nexus.Start is called.
+	Returns the name of an extension.
+
+	```lua
+	local MyExtension = Nexus.GetExtension("MyExtension")
+	print(Nexus.GetNameFromExtension(MyExtension)) -- "MyExtension"
+	```
 ]=]--
 function Nexus.RegisterExtension(ext: Extension): Extension
 	if Nexus.IsStarted then error("Cannot register extension after Nexus has started.") end
@@ -482,6 +489,8 @@ end
 	You cannot register modules after Nexus has started.
 
 	```lua
+	Nexus.Debug = true
+
 	Nexus.Start({
 		ExtensionsToLoad = {
 			ReplicatedStorage.Shared.Extensions.PlayerLifecycles,
@@ -606,6 +615,8 @@ function Nexus.Start(config: StartConfig?): Promise
 		local totalInitTime = 0
 		local proms = {}
 		for _, mod in sortedModules do
+			runExtensions("Prepare", mod)
+
 			if typeof(mod.Init) ~= "function" then continue end
 
 			local prom = Promise.new(function(r)
@@ -628,6 +639,8 @@ function Nexus.Start(config: StartConfig?): Promise
 				totalInitTime += t
 
 				log("Log", `Provider '{mod.Name}' initialized in {round(t, 6)}ms.`)
+
+				debug.profileend()
 				return r()
 			end)
 
@@ -669,6 +682,7 @@ function Nexus.Start(config: StartConfig?): Promise
 					t = os.clock() - t
 
 					log("Log", `Provider '{mod.Name}' started in {round(t, 6)}ms.`)
+					debug.profileend()
 				end)
 			end
 
