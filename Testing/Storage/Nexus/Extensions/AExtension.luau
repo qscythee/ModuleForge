@@ -12,4 +12,8 @@ function ExtensionA:BeforeStart(provider)
 	end
 end
 
+function ExtensionA:Prepare()
+	warn("Prepare!")
+end
+
 return ExtensionA

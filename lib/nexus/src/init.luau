@@ -187,12 +187,22 @@ local function round(n: number, p: number?): number
 end
 
 -- Runs all the extensions for each provider.
-local function runExtensions(fnName: string, prov: Provider)
+local function runExtensions(fnName: string, prov: Provider?)
 	local function Run(ext: Extension)
-		if typeof(ext[fnName]) ~= "function" then return end
+		if fnName == "Prepare" and typeof(ext.Prepare) == "function" then
+			debug.profilebegin(`{ext.Name}:Prepare`)
+			ext:Prepare()
+			debug.profileend()
+			log("Log", `Ran extension {ext.Name}:Prepare.`)
+			return
+		end
+
+		if not prov or typeof(ext[fnName]) ~= "function" then return end
+
 		debug.profilebegin(`{prov.Name} - {ext.Name}:{fnName}`)
 		ext[fnName](ext, prov)
 		debug.profileend()
+
 		log("Log", `Ran extension {ext.Name}:{fnName} for {prov.Name}.`)
 	end
 
@@ -200,7 +210,7 @@ local function runExtensions(fnName: string, prov: Provider)
 		Run(ext)
 	end
 
-	if typeof(prov.Extensions) == "table" then
+	if prov and typeof(prov.Extensions) == "table" then
 		for _, ext in prov.Extensions do
 			Run(ext)
 		end
@@ -611,12 +621,12 @@ function Nexus.Start(config: StartConfig?): Promise
 		log("Log", "Providers to be init/started:", sortedModules)
 		log("Log", "Starting Nexus...")
 
+		runExtensions("Prepare")
+
 		-- Init:
 		local totalInitTime = 0
 		local proms = {}
 		for _, mod in sortedModules do
-			runExtensions("Prepare", mod)
-
 			if typeof(mod.Init) ~= "function" then continue end
 
 			local prom = Promise.new(function(r)
