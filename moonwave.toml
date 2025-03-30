@@ -6,3 +6,9 @@ baseUrl = "/ModuleForge"
 
 [[classOrder]]
 classes = ["Nexus"]
+
+[[classOrder]]
+classes = ["FlagManager"]
+
+[[classOrder]]
+classes = ["Serializer"]

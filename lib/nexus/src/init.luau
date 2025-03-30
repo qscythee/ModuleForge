@@ -78,6 +78,7 @@ local loadedProviders: { [string]: Provider } = {}
 -- Consts
 local CONTEXT = if RunService:IsServer() then "SERVER" else "CLIENT"
 
+-- Types
 --[=[
 	@within Nexus
 	@interface StartConfig
@@ -220,11 +221,18 @@ local function runExtensions(fnName: string, prov: Provider?)
 end
 
 -- Registers modules/extensions in their respective directories.
-local function registerIn(type: "Provider" | "Extension" | "Required", dir: Directory | { Directory }, predicate: DirectoryPredicate?, deepSearch: boolean?)
+local function registerIn(
+	type: "Provider" | "Extension" | "Required",
+	dir: Directory | { Directory },
+	predicate: DirectoryPredicate?,
+	deepSearch: boolean?
+)
 	if typeof(dir) == "Instance" then dir = { dir } end
 
 	if type ~= "Required" and Nexus.IsStarted then error(debug.traceback("Cannot register modules after Nexus has started.")) end
-	if predicate ~= nil and typeof(predicate) ~= "function" then error(`Arg #2 'predicate' must be a function, got: {typeof(predicate)}`) end
+	if predicate ~= nil and typeof(predicate) ~= "function" then
+		error(`Arg #2 'predicate' must be a function, got: {typeof(predicate)}`)
+	end
 
 	deepSearch = if deepSearch ~= nil then deepSearch else false
 	if typeof(deepSearch) ~= "boolean" then error(`Arg #3 'deepSearch' must be a boolean or nil, got: {typeof(deepSearch)}`) end
@@ -265,9 +273,7 @@ local function registerIn(type: "Provider" | "Extension" | "Required", dir: Dire
 
 				table.insert(mods, mod)
 
-				if deepSearch then
-					search(inst:GetChildren())
-				end
+				if deepSearch then search(inst:GetChildren()) end
 			end
 		elseif inst:IsA("Folder") then
 			search(inst:GetChildren())
@@ -349,7 +355,7 @@ end
 	@return boolean
 ]=]
 function Nexus.Predicates.IsComponent(moduleScript: ModuleScript): boolean
-	local mod = require(moduleScript)
+	local mod = require(moduleScript :: any) :: any
 	return typeof(mod) == "table" and getmetatable(mod) and tostring(mod):match("^Component")
 end
 
@@ -433,7 +439,8 @@ end
 	local MyExtension = Nexus.GetExtension("MyExtension")
 	print(Nexus.GetNameFromExtension(MyExtension)) -- "MyExtension"
 	```
-]=]--
+]=]
+--
 function Nexus.RegisterExtension(ext: Extension): Extension
 	if Nexus.IsStarted then error("Cannot register extension after Nexus has started.") end
 
@@ -581,7 +588,11 @@ function Nexus.Start(config: StartConfig?): Promise
 
 			local ext = require(module :: any) :: Extension
 			if typeof(ext) ~= "table" then
-				warn(debug.traceback(`Extension at index {i} in config.ExtensionsToLoad ('{module:GetFullName()}') is not a table, got: {typeof(ext)}`))
+				warn(
+					debug.traceback(
+						`Extension at index {i} in config.ExtensionsToLoad ('{module:GetFullName()}') is not a table, got: {typeof(ext)}`
+					)
+				)
 				continue
 			end
 
@@ -616,7 +627,11 @@ function Nexus.Start(config: StartConfig?): Promise
 
 			local mod = require(prov :: any) :: Provider
 			if typeof(mod) ~= "table" then
-				warn(debug.traceback(`Provider at index {i} in config.ProvidersToLoad ('{prov:GetFullName()}') is not a table, got: {typeof(mod)}`))
+				warn(
+					debug.traceback(
+						`Provider at index {i} in config.ProvidersToLoad ('{prov:GetFullName()}') is not a table, got: {typeof(mod)}`
+					)
+				)
 				continue
 			end
 

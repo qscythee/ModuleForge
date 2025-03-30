@@ -26,4 +26,5 @@
 
 | Package | Latest Version | Description |
 |---------|----------------|-------------|
-| [Nexus](https://qscythee.github.io/ModuleForge/api/Nexus) | [`Nexus = "qscythee/nexus@0.1.0"`](https://wally.run/package/qscythee/nexus?version=0.1.0) | A provider & extension framework for Roblox. |
+| [FlagManager](https://qscythee.github.io/ModuleForge/api/FlagManager) | [`FlagManager = "qscythee/tablemanager@0.1.0"`](https://wally.run/package/qscythee/tablemanager?version=0.1.0) | A debugging & dynamic fast flag manager for Roblox. |
+| [Nexus](https://qscythee.github.io/ModuleForge/api/Nexus) | [`Nexus = "qscythee/nexus@0.3.2"`](https://wally.run/package/qscythee/nexus?version=0.3.2) | A provider & extension framework for Roblox. |

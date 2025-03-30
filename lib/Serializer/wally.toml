@@ -1,0 +1,16 @@
+[package]
+name = "qscythee/serializer"
+description = "A simple serialization utility library for Roblox."
+authors = ["Matthew (qscythee)"]
+version = "0.1.0"
+license = "MIT"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+
+[custom]
+# The properly capitalized and spaced name of the library
+formattedName = "Serializer"
+# The intro page for the documentation
+docsLink = "Serializer"
+
+[dependencies]
