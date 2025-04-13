@@ -40,20 +40,20 @@
 		},
 	}
 
-	function MyProvider:Add(x: number, y: number): number
+	function MyProvider.Add(x: number, y: number): number
 		return x + y
 	end
 
-	function MyProvider:Init()
+	function MyProvider.Init()
 		print("MyProvider initialized!")
 
 		-- This is 100% safe to do:
 		print("OtherProvider runtime data:", MyOtherProvider:SomeMethod())
 	end
 
-	function MyProvider:Start()
+	function MyProvider.Start()
 		print("MyProvider started!")
-		print(MyProvider:Add(1, 2))
+		print(MyProvider.Add(1, 2))
 	end
 
 	return MyProvider
@@ -99,14 +99,14 @@ export type StartConfig = {
 --[=[
 	@within Nexus
 	@interface Provider
-	.Init (self: Provider) -> ()? -- The method that is spawned syncronously when the provider is initialized.
-	.Start (self: Provider) -> ()? -- The method that is spawned asyncronously when the provider is started.
+	.Init () -> ()? -- The method that is spawned syncronously when the provider is initialized.
+	.Start () -> ()? -- The method that is spawned asyncronously when the provider is started.
 ]=]
 export type Provider = {
 	Name: string?,
 	Dependencies: { Provider }?,
-	Init: <T>(self: T) -> ()?,
-	Start: <T>(self: T) -> ()?,
+	Init: () -> ()?,
+	Start: () -> ()?,
 	[any]: any,
 }
 
@@ -115,9 +115,9 @@ export type DirectoryPredicate = (moduleScript: ModuleScript) -> boolean
 --[=[
 	@within Nexus
 	@interface Extension
-	.BeforeInit (self: Extension, provider: Provider) -> ()? -- The hook that fires before each provider is initialized.
-	.BeforeStart (self: Extension, provider: Provider) -> ()? -- The hook that fires before each provider is started.
-	.Prepare (self: Extension) -> ()? -- The hook that fires only once before all providers are initialized once.
+	.BeforeInit (provider: Provider) -> ()? -- The hook that fires before each provider is initialized.
+	.BeforeStart (provider: Provider) -> ()? -- The hook that fires before each provider is started.
+	.Prepare () -> ()? -- The hook that fires only once before all providers are initialized once.
 
 	Extensions allow developers to extend the functionality of modules under-the-hood.
 	This is useful for adding additional functionality to modules without modifying the provider itself.
@@ -125,9 +125,9 @@ export type DirectoryPredicate = (moduleScript: ModuleScript) -> boolean
 	do add a layer of abstraction. The use of extensions is optional and not required.
 ]=]
 export type Extension = {
-	BeforeInit: <T>(self: T, provider: Provider) -> ()?,
-	BeforeStart: <T>(self: T, provider: Provider) -> ()?,
-	Prepare: <T>(self: T) -> ()?,
+	BeforeInit: () -> ()?,
+	BeforeStart: () -> ()?,
+	Prepare: () -> ()?,
 	[any]: any,
 }
 
@@ -193,7 +193,7 @@ local function runExtensions(fnName: string, prov: Provider?)
 	local function Run(ext)
 		if fnName == "Prepare" and typeof(ext.Prepare) == "function" then
 			debug.profilebegin(`{ext.Name}:Prepare`)
-			ext:Prepare()
+			ext.Prepare()
 			debug.profileend()
 			log("Log", `Ran extension {ext.Name}:Prepare.`)
 			return
@@ -202,7 +202,7 @@ local function runExtensions(fnName: string, prov: Provider?)
 		if not prov or typeof(ext[fnName]) ~= "function" then return end
 
 		debug.profilebegin(`{prov.Name} - {ext.Name}:{fnName}`)
-		ext[fnName](ext, prov)
+		ext[fnName](prov)
 		debug.profileend()
 
 		log("Log", `Ran extension {ext.Name}:{fnName} for {prov.Name}.`)
@@ -220,11 +220,18 @@ local function runExtensions(fnName: string, prov: Provider?)
 end
 
 -- Registers modules/extensions in their respective directories.
-local function registerIn(type: "Provider" | "Extension" | "Required", dir: Directory | { Directory }, predicate: DirectoryPredicate?, deepSearch: boolean?)
+local function registerIn(
+	type: "Provider" | "Extension" | "Required",
+	dir: Directory | { Directory },
+	predicate: DirectoryPredicate?,
+	deepSearch: boolean?
+)
 	if typeof(dir) == "Instance" then dir = { dir } end
 
 	if type ~= "Required" and Nexus.IsStarted then error(debug.traceback("Cannot register modules after Nexus has started.")) end
-	if predicate ~= nil and typeof(predicate) ~= "function" then error(`Arg #2 'predicate' must be a function, got: {typeof(predicate)}`) end
+	if predicate ~= nil and typeof(predicate) ~= "function" then
+		error(`Arg #2 'predicate' must be a function, got: {typeof(predicate)}`)
+	end
 
 	deepSearch = if deepSearch ~= nil then deepSearch else false
 	if typeof(deepSearch) ~= "boolean" then error(`Arg #3 'deepSearch' must be a boolean or nil, got: {typeof(deepSearch)}`) end
@@ -265,9 +272,7 @@ local function registerIn(type: "Provider" | "Extension" | "Required", dir: Dire
 
 				table.insert(mods, mod)
 
-				if deepSearch then
-					search(inst:GetChildren())
-				end
+				if deepSearch then search(inst:GetChildren()) end
 			end
 		elseif inst:IsA("Folder") then
 			search(inst:GetChildren())
@@ -385,7 +390,7 @@ end
 	```lua
 	local MyProvider = Nexus.GetProvider("MyModule")
 	-- Safe ONLY after Nexus has started.
-	MyModule:SomeMethod()
+	MyModule.SomeMethod()
 	```
 	:::
 ]=]
@@ -433,7 +438,8 @@ end
 	local MyExtension = Nexus.GetExtension("MyExtension")
 	print(Nexus.GetNameFromExtension(MyExtension)) -- "MyExtension"
 	```
-]=]--
+]=]
+--
 function Nexus.RegisterExtension(ext: Extension): Extension
 	if Nexus.IsStarted then error("Cannot register extension after Nexus has started.") end
 
@@ -581,7 +587,13 @@ function Nexus.Start(config: StartConfig?): Promise
 
 			local ext = require(module :: any) :: Extension
 			if typeof(ext) ~= "table" then
-				warn(debug.traceback(`Extension at index {i} in config.ExtensionsToLoad ('{module:GetFullName()}') is not a table, got: {typeof(ext)}`))
+				warn(
+					debug.traceback(
+						`Extension at index {i} in config.ExtensionsToLoad ('{module:GetFullName()}') is not a table, got: {typeof(
+							ext
+						)}`
+					)
+				)
 				continue
 			end
 
@@ -616,7 +628,11 @@ function Nexus.Start(config: StartConfig?): Promise
 
 			local mod = require(prov :: any) :: Provider
 			if typeof(mod) ~= "table" then
-				warn(debug.traceback(`Provider at index {i} in config.ProvidersToLoad ('{prov:GetFullName()}') is not a table, got: {typeof(mod)}`))
+				warn(
+					debug.traceback(
+						`Provider at index {i} in config.ProvidersToLoad ('{prov:GetFullName()}') is not a table, got: {typeof(mod)}`
+					)
+				)
 				continue
 			end
 
@@ -658,7 +674,7 @@ function Nexus.Start(config: StartConfig?): Promise
 				debug.setmemorycategory(debugName)
 				debug.profilebegin(debugName)
 
-				mod:Init()
+				mod.Init()
 				mod.Init = function()
 					error(`Cannot call 'Init' on {mod.Name}, it has already been initialized!`)
 				end
@@ -702,7 +718,7 @@ function Nexus.Start(config: StartConfig?): Promise
 					debug.setmemorycategory(debugName)
 					debug.profilebegin(debugName)
 
-					mod:Start()
+					mod.Start()
 					mod.Start = function()
 						error(`Cannot call 'Start' on {mod.Name}, it has already been started!`)
 					end
@@ -731,7 +747,7 @@ end
 	```lua
 	Nexus.PromiseOnStarted():andThen(function()
 		local MyProvider = Nexus.GetProvider("MyModule")
-		MyModule:SomeMethod()
+		MyModule.SomeMethod()
 	end):catch(warn)
 	```
 ]=]
