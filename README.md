@@ -26,4 +26,4 @@
 
 | Package | Latest Version | Description |
 |---------|----------------|-------------|
-| [Nexus](https://qscythee.github.io/ModuleForge/api/Nexus) | [`Nexus = "qscythee/nexus@0.1.0"`](https://wally.run/package/qscythee/nexus?version=0.1.0) | A provider & extension framework for Roblox. |
+| [Nexus](https://qscythee.github.io/ModuleForge/api/Nexus) | [`Nexus = "qscythee/nexus@0.4.1"`](https://wally.run/package/qscythee/nexus?version=0.4.1) | A provider & extension framework for Roblox. |

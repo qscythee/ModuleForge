@@ -1,18 +1,18 @@
 local AProvider = {}
 
-function AProvider:ExtensionBeforeInit(msg: string)
+function AProvider.ExtensionBeforeInit(msg: string)
 	print("AProvider ExtensionABeforeInit: " .. msg)
 end
 
-function AProvider:ExtensionBeforeStart(msg: string)
+function AProvider.ExtensionBeforeStart(msg: string)
 	print("AProvider ExtensionABeforeStart: " .. msg)
 end
 
-function AProvider:Start()
+function AProvider.Start()
 	print("AProvider Start")
 end
 
-function AProvider:Init()
+function AProvider.Init()
 	print("AProvider Init")
 	AProvider.Foo = "Bar!"
 end

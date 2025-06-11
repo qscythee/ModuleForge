@@ -194,7 +194,6 @@ local function runExtensions(fnName: string, prov: Provider?)
 		if fnName == "Prepare" and typeof(ext.Prepare) == "function" then
 			debug.profilebegin(`{ext.Name}:Prepare`)
 			ext.Prepare()
-			debug.profileend()
 			log("Log", `Ran extension {ext.Name}:Prepare.`)
 			return
 		end
@@ -203,7 +202,6 @@ local function runExtensions(fnName: string, prov: Provider?)
 
 		debug.profilebegin(`{prov.Name} - {ext.Name}:{fnName}`)
 		ext[fnName](prov)
-		debug.profileend()
 
 		log("Log", `Ran extension {ext.Name}:{fnName} for {prov.Name}.`)
 	end
@@ -686,7 +684,6 @@ function Nexus.Start(config: StartConfig?): Promise
 
 				log("Log", `Provider '{mod.Name}' initialized in {round(t, 6)}ms.`)
 
-				debug.profileend()
 				return r()
 			end)
 
@@ -728,7 +725,6 @@ function Nexus.Start(config: StartConfig?): Promise
 					t = os.clock() - t
 
 					log("Log", `Provider '{mod.Name}' started in {round(t, 6)}ms.`)
-					debug.profileend()
 				end)
 			end
 
