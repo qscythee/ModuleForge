@@ -70,13 +70,8 @@ local Packages = script.Parent
 local Promise = require(Packages.Promise) ---@module _Promise
 local Signal = require(Packages.Signal) ---@module _Signal
 
--- Vars
-local startedSignal = Signal.new()
-local loadedExtensions: { [string]: Extension } = {}
-local loadedProviders: { [string]: Provider } = {}
-
--- Consts
-local CONTEXT = if RunService:IsServer() then "SERVER" else "CLIENT"
+-- Types
+type Promise = Promise.Promise
 
 --[=[
 	@within Nexus
@@ -137,8 +132,15 @@ type LoadedProvider = Provider & {
 	_IsStart: true,
 }
 
-type Promise = typeof(Promise.new())
 type Directory = Folder | ModuleScript
+
+-- Vars
+local startedSignal = Signal.new()
+local loadedExtensions: { [string]: Extension } = {}
+local loadedProviders: { [string]: Provider } = {}
+
+-- Consts
+local CONTEXT = if RunService:IsServer() then "SERVER" else "CLIENT"
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 -- Provider

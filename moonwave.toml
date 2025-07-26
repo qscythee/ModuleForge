@@ -6,7 +6,3 @@ baseUrl = "/ModuleForge"
 
 [[classOrder]]
 classes = ["Nexus"]
-
-[[classOrder]]
-section = "PlayerDataManager"
-classes = ["PlayerDataManager", "ServerPlayerDataManager", "ClientPlayerDataManager"]
