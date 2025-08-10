@@ -1,4 +1,6 @@
-local AProvider = {}
+local AProvider = {
+	Priority = 1000,
+}
 
 function AProvider.ExtensionBeforeInit(msg: string)
 	print("AProvider ExtensionABeforeInit: " .. msg)

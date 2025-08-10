@@ -6,3 +6,7 @@ baseUrl = "/ModuleForge"
 
 [[classOrder]]
 classes = ["Nexus"]
+
+# [[classOrder]]
+# section = "FlagManager"
+# classes = ["FlagManager", "FlagManagerServer", "FlagManagerClient"]

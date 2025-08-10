@@ -24,6 +24,9 @@
 	* Providers do not have to have either the "Init" or "Start" method.
 	* Providers are guaranteed to be initialized in the expected order VIA the custom
 	load order or topological sorting where dependencies are actually respected.
+	* Providers can define priorities to control the order in which they are initialized and started.
+	  * This also respects dependencies, if A has a priority of 2000 and B has a priority of 1000,
+	  and A depends on B, B will be initialized before A.
 	* The name "Provider", "Service", or "Controller" is not required, you decide
 	what convention to follow when naming your modules.
 	* Extensions are optional and are used to extend the functionality of modules
@@ -100,6 +103,7 @@ export type StartConfig = {
 export type Provider = {
 	Name: string?,
 	Dependencies: { Provider }?,
+	Priority: number?,
 	Init: () -> ()?,
 	Start: () -> ()?,
 	[any]: any,
@@ -180,7 +184,7 @@ local function log(level: "Log" | "Warn" | "Error", ...: any)
 	elseif level == "Warn" then
 		warn(`<| NEXUS DEBUG |> [{CONTEXT}] `, ...)
 	elseif level == "Error" then
-		error(`<| NEXUS DEBUG |> [{CONTEXT}] {table.concat({ ... }, " ")}`, 2)
+		task.spawn(error, `<| NEXUS DEBUG |> [{CONTEXT}] {table.concat({ ... }, " ")}`, 2)
 	end
 end
 
@@ -262,6 +266,7 @@ local function registerIn(
 
 				if type == "Provider" then
 					mod.Name = mod.Name or inst.Name
+					mod.Priority = mod.Priority or 0
 					mod._IsInit = false
 					mod._IsStart = false
 					Nexus.RegisterProvider(mod)
@@ -488,30 +493,69 @@ function Nexus.RegisterProvider(prov: Provider)
 	loadedProviders[name] = prov
 end
 
--- Performs topological sorting of modules based on their dependencies.
+-- Performs topological sorting with priority using Kahn's algorithm and a simple priority queue
 local function topologicalSort(provs: { [string]: Provider }): { Provider }
-	local sorted, visited, checking = {}, {}, {}
+	local sorted, inDegree, graph = {}, {}, {}
+	local providerList = {}
 
-	local function visit(mod: Provider, path: string?)
-		if checking[mod] then error(`Cyclic dependency detected in path: {mod.Name} -> {path}`) end
-		if visited[mod] then return end
-
-		checking[mod] = true
-
-		if typeof(mod.Dependencies) == "table" then
-			for dep in mod.Dependencies do
-				visit(dep, if path then path .. ` -> {dep.Name}` else `{dep.Name}`)
-			end
-		end
-
-		checking[mod] = nil
-		visited[mod] = true
-
-		table.insert(sorted, mod)
+	-- Initialize graph and in-degrees
+	for _, p in provs do
+		table.insert(providerList, p)
+		inDegree[p] = 0
+		graph[p] = {}
 	end
 
-	for _, prov in provs do
-		visit(prov)
+	-- Build dependency graph
+	for _, p in providerList do
+		if typeof(p.Dependencies) == "table" then
+			for dep in p.Dependencies do
+				if not graph[dep] then
+					error(`Provider '{p.Name}' depends on '{dep.Name or "unknown"}', but this dependency was not found.`)
+				end
+				table.insert(graph[dep], p)
+				inDegree[p] += 1
+			end
+		end
+	end
+
+	-- Priority queue using simple insertion sort (efficient for small queues)
+	local queue = {}
+	local function insertSorted(provider)
+		local priority = if typeof(provider.Priority) == "number" then provider.Priority else 0
+		local insertPos = #queue + 1
+		for i, p in queue do
+			local pPriority = if typeof(p.Priority) == "number" then p.Priority else 0
+			if priority > pPriority then
+				insertPos = i
+				break
+			end
+		end
+		table.insert(queue, insertPos, provider)
+	end
+
+	-- Add providers with no dependencies to queue
+	for _, p in providerList do
+		if inDegree[p] == 0 then insertSorted(p) end
+	end
+
+	-- Process queue
+	while #queue > 0 do
+		local current = table.remove(queue, 1) -- Remove highest priority
+		table.insert(sorted, current)
+
+		for _, dependent in graph[current] or {} do
+			inDegree[dependent] -= 1
+			if inDegree[dependent] == 0 then insertSorted(dependent) end
+		end
+	end
+
+	-- Check for cycles or missing dependencies
+	if #sorted ~= #providerList then
+		local remaining = {}
+		for _, p in providerList do
+			if inDegree[p] > 0 then table.insert(remaining, p.Name) end
+		end
+		error("Cyclic dependency or missing providers detected: " .. table.concat(remaining, ", "))
 	end
 
 	return sorted

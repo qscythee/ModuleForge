@@ -7,7 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 type table = { [any]: any }
 
-local TEST_CUSTOM_LOAD_ARRAY = true
+local TEST_CUSTOM_LOAD_ARRAY = false
 
 return function()
 	local Nexus = require(script.Parent) ---@module Nexus
@@ -23,6 +23,10 @@ return function()
 					ProvidersToLoad = {
 						ReplicatedStorage.Storage.Nexus.Providers.AProvider,
 						ReplicatedStorage.Storage.Nexus.Providers.BProvider,
+						ReplicatedStorage.Storage.Nexus.Providers.CProvider,
+						ReplicatedStorage.Storage.Nexus.Providers.DProvider,
+						ReplicatedStorage.Storage.Nexus.Providers.EProvider,
+						ReplicatedStorage.Storage.Nexus.Providers.FProvider,
 					},
 				}):await()
 				expect(success).to.be.ok()

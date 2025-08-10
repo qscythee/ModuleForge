@@ -1,6 +1,9 @@
-local AProvider = require("./AProvider")
+local AProviderScript = (script.Parent :: Folder):FindFirstChild("AProvider") :: ModuleScript
+local AProvider = require(AProviderScript)
 
 local BProvider = {
+	Priority = 999,
+
 	Dependencies = {
 		[AProvider] = true,
 	},
