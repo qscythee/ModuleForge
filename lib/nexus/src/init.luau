@@ -43,20 +43,20 @@
 		},
 	}
 
-	function MyProvider.Add(x: number, y: number): number
+	function MyProvider:Add(x: number, y: number): number
 		return x + y
 	end
 
-	function MyProvider.Init()
+	function MyProvider:Init()
 		print("MyProvider initialized!")
 
 		-- This is 100% safe to do:
 		print("OtherProvider runtime data:", MyOtherProvider:SomeMethod())
 	end
 
-	function MyProvider.Start()
+	function MyProvider:Start()
 		print("MyProvider started!")
-		print(MyProvider.Add(1, 2))
+		print(MyProvider:Add(1, 2))
 	end
 
 	return MyProvider
@@ -104,8 +104,8 @@ export type Provider = {
 	Name: string?,
 	Dependencies: { Provider }?,
 	Priority: number?,
-	Init: () -> ()?,
-	Start: () -> ()?,
+	Init: ((self: Provider) -> ())?,
+	Start: ((self: Provider) -> ())?,
 	[any]: any,
 }
 
@@ -124,9 +124,10 @@ export type DirectoryPredicate = (moduleScript: ModuleScript) -> boolean
 	do add a layer of abstraction. The use of extensions is optional and not required.
 ]=]
 export type Extension = {
-	BeforeInit: () -> ()?,
-	BeforeStart: () -> ()?,
-	Prepare: () -> ()?,
+	Name: string?,
+	BeforeInit: ((self: Extension, provider: Provider) -> ())?,
+	BeforeStart: ((self: Extension, provider: Provider) -> ())?,
+	Prepare: ((self: Extension) -> ())?,
 	[any]: any,
 }
 
@@ -199,7 +200,7 @@ local function runExtensions(fnName: string, prov: Provider?)
 	local function Run(ext)
 		if fnName == "Prepare" and typeof(ext.Prepare) == "function" then
 			debug.profilebegin(`{ext.Name}:Prepare`)
-			ext.Prepare()
+			ext:Prepare()
 			log("Log", `Ran extension {ext.Name}:Prepare.`)
 			return
 		end
@@ -207,7 +208,7 @@ local function runExtensions(fnName: string, prov: Provider?)
 		if not prov or typeof(ext[fnName]) ~= "function" then return end
 
 		debug.profilebegin(`{prov.Name} - {ext.Name}:{fnName}`)
-		ext[fnName](prov)
+		ext[fnName](ext, prov)
 
 		log("Log", `Ran extension {ext.Name}:{fnName} for {prov.Name}.`)
 	end
@@ -452,8 +453,8 @@ function Nexus.RegisterExtension(ext: Extension): Extension
 	if typeof(name) ~= "string" then error(`Extension.Name must be a string, got: {typeof(name)}`) end
 	if loadedProviders[name] then error(`Provider with name '{name}' already exists.`) end
 
-	loadedExtensions[ext.Name] = ext
-	log("Log", `Extension '{ext.Name}' registered -`, ext)
+	loadedExtensions[name] = ext
+	log("Log", `Extension '{name}' registered -`, ext)
 	return ext
 end
 
@@ -718,7 +719,7 @@ function Nexus.Start(config: StartConfig?): Promise
 				debug.setmemorycategory(debugName)
 				debug.profilebegin(debugName)
 
-				mod.Init()
+				mod:Init()
 				mod.Init = function()
 					error(`Cannot call 'Init' on {mod.Name}, it has already been initialized!`)
 				end
@@ -761,7 +762,7 @@ function Nexus.Start(config: StartConfig?): Promise
 					debug.setmemorycategory(debugName)
 					debug.profilebegin(debugName)
 
-					mod.Start()
+					mod:Start()
 					mod.Start = function()
 						error(`Cannot call 'Start' on {mod.Name}, it has already been started!`)
 					end
